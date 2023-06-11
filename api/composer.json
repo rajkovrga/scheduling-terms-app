@@ -1,0 +1,14 @@
+{
+    "version": "1.0.0",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Rajko Vrga",
+            "email": "rajko@vrga.dev",
+            "homepage": "https://www.vrga.dev",
+            "role": "Developer"
+        }
+    ],
+    "require": {    
+    }
+}
