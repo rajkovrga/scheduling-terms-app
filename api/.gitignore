@@ -3,6 +3,5 @@ composer.lock
 /vendor/*
 /docker/data/*
 /docker/data/
-/docker/data/
 /docker/nginx/logs
 /docker/nginx/logs/*
