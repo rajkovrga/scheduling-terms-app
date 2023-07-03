@@ -9,6 +9,12 @@
             "role": "Developer"
         }
     ],
-    "require": {    
+    "require": {
+        "php-di/php-di": "^7.0",
+        "monolog/monolog": "^3.4",
+        "slim/slim": "4.*",
+        "vlucas/phpdotenv": "^5.5",
+        "slim/psr7": "^1.6",
+        "phpunit/phpunit": "^10.2"
     }
 }
