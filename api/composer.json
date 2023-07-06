@@ -16,5 +16,18 @@
         "vlucas/phpdotenv": "^5.5",
         "slim/psr7": "^1.6",
         "phpunit/phpunit": "^10.2"
+    },
+    "autoload": {
+        "classmap": [
+            "app/Controllers"
+        ],
+        "psr-4": {
+            "SchedulingTerms\\App\\": "app"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "SchedulingTerms\\Tests\\": "tests"
+        }
     }
 }

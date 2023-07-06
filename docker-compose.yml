@@ -26,6 +26,7 @@ services:
     postgres:
         image: postgres:latest
         restart: unless-stopped
+        container_name: local_pgdata
         environment:
               POSTGRES_PASSWORD: example
         networks:
@@ -33,7 +34,7 @@ services:
         depends_on:
             - api
         ports:
-            - 8081:8081
+            - "54320:5432"
         volumes:
             - ./api/docker/data/postgres:/var/log/postgresql
     redis:
@@ -44,24 +45,30 @@ services:
         depends_on:
             - api
         ports:
-            - 6379:6379
-            - 8001:8001
+            - "6379:6379"
+            - "8001:8001"
         volumes:
             - ./api/docker/data/redis:/var/opt/redislabs
     pgadmin:
         image: dpage/pgadmin4:latest
         restart: unless-stopped
+        container_name: pgadmin-data
         networks:
             - net
         depends_on:
             - api
         environment:
-            PGADMIN_DEFAULT_EMAIL: test@test.com
-            PGADMIN_DEFAULT_PASSWORD: test
+            PGADMIN_DEFAULT_EMAIL: .env.example@.env.example.com
+            PGADMIN_DEFAULT_PASSWORD: .env.example
+        user: root
         ports:
-            - 5050:80
+            - "5050:80"
         volumes:
-            - ./pgadmin-data:/var/lib/pgadmin
+            - ./api/docker/data/pgadmin-data:/var/lib/pgadmin
 networks:
     net:
         driver: bridge
+
+volumes:
+    local_pgdata:
+    pgadmin-data:

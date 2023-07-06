@@ -7,7 +7,7 @@ COPY --from=composer /usr/bin/composer /usr/bin/composer
 
 COPY . /var/www/html
 
-ENV COMPOSER_ALLOW_SUPERUSER=1 
+ENV COMPOSER_ALLOW_SUPERUSER=1
 
 RUN apt update -y && apt upgrade -y && \
     apt install -y libmagickwand-dev --no-install-recommends && \
