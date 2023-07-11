@@ -10,4 +10,4 @@ docker run \
   --env COMPOSER_HOME \
   --env COMPOSER_CACHE_DIR \
   --user "$(id -u):$(id -g)" \
-   composer:2.1 "$@"
+    "$@"

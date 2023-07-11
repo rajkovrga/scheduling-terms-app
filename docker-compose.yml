@@ -28,7 +28,9 @@ services:
         restart: unless-stopped
         container_name: local_pgdata
         environment:
-              POSTGRES_PASSWORD: example
+            POSTGRES_USER: root
+            POSTGRES_PASSWORD: root
+            POSTGRES_DB: termsDb           
         networks:
             - net
         depends_on:
@@ -58,8 +60,8 @@ services:
         depends_on:
             - api
         environment:
-            PGADMIN_DEFAULT_EMAIL: .env.example@.env.example.com
-            PGADMIN_DEFAULT_PASSWORD: .env.example
+            PGADMIN_DEFAULT_EMAIL: rajko@vrga.dev
+            PGADMIN_DEFAULT_PASSWORD: root
         user: root
         ports:
             - "5050:80"

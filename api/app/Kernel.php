@@ -4,11 +4,11 @@ namespace SchedulingTerms\App;
 
 class Kernel extends Core\Kernel
 {
-    protected $middlewares = [
+    protected array $middlewares = [
 
     ];
 
-    protected $globalMiddlewares = [
+    protected array $globalMiddlewares = [
 
     ];
 }
