@@ -30,13 +30,13 @@ services:
         environment:
             POSTGRES_USER: root
             POSTGRES_PASSWORD: root
-            POSTGRES_DB: termsDb           
+            POSTGRES_DB: termsDb
         networks:
             - net
         depends_on:
             - api
         ports:
-            - "54320:5432"
+            - "5432:5432"
         volumes:
             - ./api/docker/data/postgres:/var/log/postgresql
     redis:

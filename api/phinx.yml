@@ -15,12 +15,12 @@ environments:
     #     charset: utf8
 
     development:
-        adapter: postgres
-        host: 172.20.0.5
+        adapter: pgsql
+        host: 172.25.0.4
         name: termsDb
         user: root
         pass: root
-        port: 3306
+        port: 5432
         charset: utf8
 
     # testing:
@@ -33,3 +33,4 @@ environments:
     #     charset: utf8
 
 version_order: creation
+

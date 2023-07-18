@@ -33,5 +33,59 @@ class InitMigration extends AbstractMigration
     public function change()
     {
 
+        $this->table('roles')
+            ->addColumn('name', 'string')
+            ->create();
+
+        $this->table('permissions')
+            ->addColumn('name', 'string')
+            ->create();
+
+        $this->table('role_permission')
+            ->addColumn('role_id', 'integer')
+            ->addColumn('permission_id', 'integer')
+            ->addForeignKey('role_id', 'roles', 'id', ['delete' => 'CASCADE', 'update' => 'CASCADE'])
+            ->addForeignKey('permission_id', 'permissions', 'id', ['delete' => 'CASCADE', 'update' => 'CASCADE'])
+            ->create();
+
+        $this->table('companies')->addColumn('name', 'string')
+            ->addColumn('created_at', 'datetime')
+            ->addColumn('updated_at', 'datetime')
+            ->create();
+
+        $this->table('jobs')
+            ->addColumn('name', 'string')
+            ->addColumn('during', 'integer')
+            ->addColumn('company_id', 'integer')
+            ->addForeignKey('company_id', 'companies', 'id', ['delete' => 'CASCADE', 'update' => 'CASCADE'])
+            ->addColumn('created_at', 'datetime')
+            ->addColumn('updated_at', 'datetime')
+            ->create();
+
+        $this->table('users')->addColumn('name', 'string')
+            ->addColumn('email', 'string', ['limit' => 100,])
+            ->addColumn('password', 'string')
+            ->addColumn('company_id', 'integer', ['null' => true])
+            ->addColumn('created_at', 'datetime')
+            ->addColumn('updated_at', 'datetime')
+            ->addColumn('role_id', 'integer')
+            ->addForeignKey('company_id', 'companies', 'id', ['delete' => 'CASCADE', 'update' => 'CASCADE'])
+            ->addForeignKey('role_id', 'roles', 'id', ['delete' => 'CASCADE', 'update' => 'CASCADE'])
+            ->addIndex(['email'], ['unique' => true])
+            ->addIndex(['password'])
+            ->addIndex(['role_id'])
+            ->addIndex(['name'])
+            ->create();
+
+            $this->table('terms')
+            ->addColumn('user_id', 'integer')
+            ->addColumn('start_date', 'date')
+            ->addColumn('end_date', 'date')
+            ->addColumn('job_id', 'integer')
+            ->addColumn('company_id', 'integer')
+            ->addForeignKey('user_id', 'users', 'id', ['delete' => 'CASCADE', 'update' => 'CASCADE'])
+            ->addForeignKey('job_id', 'jobs', 'id', ['delete' => 'CASCADE', 'update' => 'CASCADE'])
+            ->addForeignKey('company_id', 'companies', 'id', ['delete' => 'CASCADE', 'update' => 'CASCADE'])
+            ->create();
     }
 }

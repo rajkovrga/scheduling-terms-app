@@ -2,7 +2,6 @@
 
 namespace SchedulingTerms\App\Controllers;
 
-use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use SchedulingTerms\App\Core\Routing\Attributes\GetRoute;
@@ -16,7 +15,6 @@ class AuthController
 
     #[PostRoute('/login')]
     public function login(ServerRequestInterface $request,ResponseInterface $response, array $args) {
-
     }
 
     #[PostRoute('/register')]
@@ -26,6 +24,7 @@ class AuthController
 
     #[GetRoute('/me')]
     public function me(ServerRequestInterface $request,ResponseInterface $response, array $args) {
+        var_dump("PERA");
 
     }
 

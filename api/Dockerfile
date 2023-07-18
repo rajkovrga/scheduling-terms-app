@@ -11,7 +11,7 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 
 RUN apt update -y && apt upgrade -y && \
     apt install -y libmagickwand-dev --no-install-recommends && \
-    install-php-extensions intl zip bcmath pdo_mysql pcntl \
+    install-php-extensions intl zip bcmath pdo_pgsql pcntl \
     gmp opcache uuid amqp json_post imagick apcu \
     igbinary ast redis xdebug mongodb
 

@@ -10,17 +10,19 @@ class DILoader
     private function getAllDefinitions(string $path): array {
         $files = scandir($path);
         $arr = [];
-
         foreach ($files as $file) {
             if(preg_match('/\.php/', $file)) {
                 $data = require $path . '/' . $file;
-                $defs = array_merge($arr, $data);
+                $arr = array_merge($arr, $data);
             }
         }
 
         return $arr;
     }
 
+    /**
+     * @throws \Exception
+     */
     public function load($path = __DIR__ . '/../../../di'): Container {
         $builder = new ContainerBuilder();
 
