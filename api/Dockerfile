@@ -15,7 +15,6 @@ RUN apt update -y && apt upgrade -y && \
     gmp opcache uuid amqp json_post imagick apcu \
     igbinary ast redis xdebug mongodb
 
-
 RUN composer install --optimize-autoloader --apcu-autoloader --ignore-platform-reqs
 
 CMD ["php-fpm"]

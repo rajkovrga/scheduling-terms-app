@@ -2,9 +2,10 @@
 
 namespace SchedulingTerms\App\Dto\Users;
 
-class UserDto
-{
+use SchedulingTerms\App\Dto\BaseDto;
 
+class UserDto extends BaseDto
+{
     private string $name;
     private string $email;
     private string $password;

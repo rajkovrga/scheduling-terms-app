@@ -96,7 +96,6 @@ class Kernel
                     );
 
                     $this->setMiddlewares($args[1] ?? [], $group);
-
                     continue;
                 }
                 $this->registerRoute($methods, $namespace, $this->app, $args[1] ?? []);
@@ -147,9 +146,7 @@ class Kernel
                 };
 
                 $grp = $group->{$requestType}($attribute->getArguments()[0], [$namespace, $method->getName()]);
-                var_dump($group);
                 $this->setMiddlewares($middlewares, $grp);
-
             }
         }
     }

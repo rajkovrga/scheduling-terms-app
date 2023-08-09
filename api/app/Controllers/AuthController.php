@@ -9,7 +9,6 @@ use SchedulingTerms\App\Core\Routing\Attributes\GroupRoute;
 use SchedulingTerms\App\Core\Routing\Attributes\PostRoute;
 use SchedulingTerms\App\Core\Routing\Attributes\PutRoute;
 
-#[GroupRoute('auth')]
 class AuthController
 {
 
@@ -23,9 +22,9 @@ class AuthController
     }
 
     #[GetRoute('/me')]
-    public function me(ServerRequestInterface $request,ResponseInterface $response, array $args) {
-        var_dump("PERA");
-
+    public function me(ServerRequestInterface $request,ResponseInterface $response): ResponseInterface
+    {
+        return $response->withJson([], 201);
     }
 
     #[PostRoute('/forget-password/{token}')]
