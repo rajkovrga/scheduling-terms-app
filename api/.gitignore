@@ -1,7 +1,4 @@
-composer.lock
 /vendor
-/vendor/*
-/docker/data/*
-/docker/data/
-/docker/nginx/logs
-/docker/nginx/logs/*
+.env
+!.env.example
+compiled_container/

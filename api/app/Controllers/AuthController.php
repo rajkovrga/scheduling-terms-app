@@ -13,11 +13,11 @@ class AuthController
 {
 
     #[PostRoute('/login')]
-    public function login(ServerRequestInterface $request,ResponseInterface $response, array $args) {
+    public function login(ServerRequestInterface $request,ResponseInterface $response) {
     }
 
     #[PostRoute('/register')]
-    public function register(ServerRequestInterface $request,ResponseInterface $response, array $args) {
+    public function register(ServerRequestInterface $request,ResponseInterface $response) {
 
     }
 
@@ -28,12 +28,12 @@ class AuthController
     }
 
     #[PostRoute('/forget-password/{token}')]
-    public function forgetPassword(ServerRequestInterface $request,ResponseInterface $response, array $args) {
+    public function forgetPassword(ServerRequestInterface $request,ResponseInterface $response, string $token) {
 
     }
 
     #[PutRoute('/change-password')]
-    public function changePassword(ServerRequestInterface $request,ResponseInterface $response, array $args) {
+    public function changePassword(ServerRequestInterface $request,ResponseInterface $response) {
 
     }
 

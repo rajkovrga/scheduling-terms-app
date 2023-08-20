@@ -7,7 +7,7 @@ use SchedulingTerms\App\Dto\Companies\CompanyDto;
 use SchedulingTerms\App\Dto\Jobs\JobDto;
 use SchedulingTerms\App\Dto\Users\UserDto;
 
-class TermDto extends BaseDto
+class TermDto
 {
     private int $id;
     private ?UserDto $user = null;
@@ -16,23 +16,10 @@ class TermDto extends BaseDto
     private ?JobDto $job = null;
     private ?CompanyDto $company = null;
 
-    public static function from(array $arr): TermDto|array
+    public static function from(array $arr): static
     {
-        if(count($arr) > 1) {
-            $data = [];
-            foreach ($arr as $a) {
-                $job = new JobDto();
-                $job->setProperties($a);
-                $data[] = $job;
-            }
 
-            return $data;
-        }
-
-        $data = new TermDto();
-        $data->setProperties($arr);
-
-        return $data;
+        return new self;
     }
 
 }

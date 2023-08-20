@@ -1,5 +1,5 @@
 <?php
-
+declare(strict_types=1);
 
 use Faker\Factory;
 use Phinx\Seed\AbstractSeed;

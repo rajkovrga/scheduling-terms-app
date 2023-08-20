@@ -15,7 +15,7 @@ class DatabaseConnection {
     private string $charset;
     private ?PDO $pdo = null;
 
-    public function __construct($host, $port, $username, $password, $dbname, $charset = 'utf8') {
+    public function __construct($host, $port, $username, $password, $dbname, $charset) {
         $this->host = $host;
         $this->port = $port;
         $this->username = $username;
@@ -27,7 +27,7 @@ class DatabaseConnection {
     }
 
     private function connect() {
-        $dsn = "pgsql:host=$this->host:$this->port;dbname=$this->dbname;charset=$this->charset";
+        $dsn = "pgsql:host=$this->host:$this->port;dbname=$this->dbname;options='-c client_encoding=$this->charset'";
         $options = [
             PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,

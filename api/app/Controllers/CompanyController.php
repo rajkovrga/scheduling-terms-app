@@ -15,27 +15,27 @@ class CompanyController
 {
 
     #[GetRoute('')]
-    public function getCompanies(ServerRequestInterface $request,ResponseInterface $response, array $args) {
+    public function getCompanies(ServerRequestInterface $request,ResponseInterface $response) {
 
     }
 
     #[GetRoute('/{id}')]
-    public function getCompany(ServerRequestInterface $request,ResponseInterface $response, array $args) {
+    public function getCompany(ServerRequestInterface $request,ResponseInterface $response, int $id) {
 
     }
 
     #[PostRoute('')]
-    public function createCompany(ServerRequestInterface $request,ResponseInterface $response, array $args) {
+    public function createCompany(ServerRequestInterface $request,ResponseInterface $response) {
 
     }
 
     #[DeleteRoute('/{id}')]
-    public function deleteCompany(ServerRequestInterface $request,ResponseInterface $response, array $args) {
+    public function deleteCompany(ServerRequestInterface $request,ResponseInterface $response, int $id) {
 
     }
 
     #[PutRoute('/{id}')]
-    public function editCompany(ServerRequestInterface $request,ResponseInterface $response, array $args) {
+    public function editCompany(ServerRequestInterface $request,ResponseInterface $response, int $id) {
 
     }
 }

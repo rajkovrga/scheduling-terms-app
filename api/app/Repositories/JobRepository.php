@@ -2,13 +2,12 @@
 
 namespace SchedulingTerms\App\Repositories;
 
-use SchedulingTerms\App\Contracts\Repositories\RepositoryContract;
-use SchedulingTerms\App\Contracts\Repositories\TermsRepositoryContract;
+use SchedulingTerms\App\Contracts\Repositories\JobRepositoryContract;
 use SchedulingTerms\App\Core\Data\DatabaseConnection;
 use SchedulingTerms\App\Dto\Jobs\JobDto;
 use SchedulingTerms\App\Dto\Pagination\PaginateDto;
 
-class JobRepository implements TermsRepositoryContract
+class JobRepository implements JobRepositoryContract
 {
 
     public function __construct(

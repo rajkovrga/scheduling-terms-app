@@ -12,10 +12,10 @@ class RedisConnection {
         $this->connect($host, $port);
     }
 
-    private function connect($host, $port): void
+    private function connect(string $host,string $port): void
     {
         try {
-            $this->redis->connect($host, $port);
+            $this->redis->connect($host, intval($port));
             echo "Connected to Redis server." . PHP_EOL;
         } catch (RedisException $e) {
             echo "Error connecting to Redis server: " . $e->getMessage() . PHP_EOL;

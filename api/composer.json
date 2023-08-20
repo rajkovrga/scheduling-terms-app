@@ -24,9 +24,6 @@
         "ext-redis": "*"
     },
     "autoload": {
-        "classmap": [
-            "app/Controllers"
-        ],
         "psr-4": {
             "SchedulingTerms\\App\\": "app",
             "Db\\Seeders\\": "db/seeders/"

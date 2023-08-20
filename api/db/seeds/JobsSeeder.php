@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 use Faker\Factory;
 use Phinx\Seed\AbstractSeed;
@@ -27,9 +28,9 @@ class JobsSeeder extends AbstractSeed
         $format = 'Y-m-d\TH:i:sP';
         $jobs = [];
         $companies = $this->fetchAll('SELECT * FROM companies');
-        $ids = array_map(function($item) {
-            return $item['id'];
-        }, $companies);
+//        $ids = array_map(function($item) {
+//            return $item['id'];
+//        }, $companies);
 
         for ($i = 1; $i < 200; $i++) {
             $jobs[] = [

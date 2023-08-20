@@ -2,12 +2,14 @@
 
 namespace SchedulingTerms\App\Core;
 
+use Attribute;
 use DI\Container;
 use DI\DependencyException;
 use DI\NotFoundException;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use ReflectionClass;
+use ReflectionMethod;
 use SchedulingTerms\App\Core\Routing\Attributes\DeleteRoute;
 use SchedulingTerms\App\Core\Routing\Attributes\GetRoute;
 use SchedulingTerms\App\Core\Routing\Attributes\GroupRoute;
@@ -54,7 +56,7 @@ class Kernel
         }
     }
 
-    private function getControllers(string $dir = __DIR__ . '/../Controllers', array &$result = []): array {
+    private function getControllers(string $dir = __DIR__ . '/../Controllers', array $result = []): array {
         $controllers = array_diff(scandir($dir), ['.', '..']);
 
         foreach ($controllers as $controller) {
@@ -135,18 +137,22 @@ class Kernel
         array               $middlewares = []
     ): void
     {
+        /** @var ReflectionMethod $method */
         foreach ($methods as $method) {
             $attributes = $method->getAttributes();
             foreach ($attributes as $attribute) {
-                $requestType = match ($attribute->getName()) {
-                    PostRoute::class => 'post',
-                    DeleteRoute::class => 'delete',
-                    GetRoute::class => 'get',
-                    PutRoute::class => 'put',
+                $requestType = match (true) {
+                    $attributes instanceof PostRoute => 'post',
+                    $attributes instanceof DeleteRoute => 'delete',
+                    $attributes instanceof GetRoute => 'get',
+                    $attributes instanceof PutRoute => 'put',
+                    default => null,
                 };
 
-                $grp = $group->{$requestType}($attribute->getArguments()[0], [$namespace, $method->getName()]);
-                $this->setMiddlewares($middlewares, $grp);
+                if ($attribute !== null) {
+                    $grp = $group->map([$requestType], $attribute->getArguments()[0], [$namespace, $method->getName()]);
+                    $this->setMiddlewares($middlewares, $grp);
+                }
             }
         }
     }

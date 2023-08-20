@@ -4,7 +4,7 @@ namespace SchedulingTerms\App\Dto\Companies;
 
 use SchedulingTerms\App\Dto\BaseDto;
 
-class CompanyDto extends BaseDto
+class CompanyDto
 {
     private int $id;
     private string $name;

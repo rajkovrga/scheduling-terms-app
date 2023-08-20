@@ -2,9 +2,7 @@
 
 namespace SchedulingTerms\App\Dto\Jobs;
 
-use SchedulingTerms\App\Dto\BaseDto;
-
-class JobDto extends BaseDto
+class JobDto
 {
     private int $id;
     private string $name;

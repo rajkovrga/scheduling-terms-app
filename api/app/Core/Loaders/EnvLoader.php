@@ -9,8 +9,7 @@ class EnvLoader
 {
     public function load(string $path = __DIR__ . '/../../../configurations'): void
     {
-        $files = array_diff(scandir($path), ['..','.']);
-        $dotenv = Dotenv::createUnsafeMutable($path, $files);
-        $dotenv->load();
     }
+
+
 }

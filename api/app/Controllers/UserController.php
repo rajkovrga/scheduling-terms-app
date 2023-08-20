@@ -14,27 +14,27 @@ use SchedulingTerms\App\Core\Routing\Attributes\PutRoute;
 class UserController
 {
     #[GetRoute('')]
-    public function getUsers(ServerRequestInterface $request,ResponseInterface $response, array $args) {
+    public function getUsers(ServerRequestInterface $request,ResponseInterface $response) {
 
     }
 
     #[GetRoute('/{id}')]
-    public function getUser(ServerRequestInterface $request,ResponseInterface $response, array $args) {
+    public function getUser(ServerRequestInterface $request,ResponseInterface $response, int $id) {
 
     }
 
     #[PostRoute('')]
-    public function createUser(ServerRequestInterface $request,ResponseInterface $response, array $args) {
+    public function createUser(ServerRequestInterface $request,ResponseInterface $response) {
 
     }
 
     #[DeleteRoute('/{id}')]
-    public function deleteUser(ServerRequestInterface $request,ResponseInterface $response, array $args) {
+    public function deleteUser(ServerRequestInterface $request,ResponseInterface $response, int $id) {
 
     }
 
     #[PutRoute('/{id}')]
-    public function editUser(ServerRequestInterface $request,ResponseInterface $response, array $args) {
+    public function editUser(ServerRequestInterface $request,ResponseInterface $response, int $id) {
 
     }
 }

@@ -14,27 +14,27 @@ use SchedulingTerms\App\Core\Routing\Attributes\PutRoute;
 class TermController
 {
     #[GetRoute('')]
-    public function getTerms(ServerRequestInterface $request,ResponseInterface $response, array $args) {
+    public function getTerms(ServerRequestInterface $request,ResponseInterface $response) {
 
     }
 
     #[GetRoute('/{id}')]
-    public function getTerm(ServerRequestInterface $request,ResponseInterface $response, array $args) {
+    public function getTerm(ServerRequestInterface $request,ResponseInterface $response, int $id) {
 
     }
 
     #[PostRoute('')]
-    public function createTerm(ServerRequestInterface $request,ResponseInterface $response, array $args) {
+    public function createTerm(ServerRequestInterface $request,ResponseInterface $response) {
 
     }
 
     #[DeleteRoute('/{id}')]
-    public function deleteTerm(ServerRequestInterface $request,ResponseInterface $response, array $args) {
+    public function deleteTerm(ServerRequestInterface $request,ResponseInterface $response, int $id) {
 
     }
 
     #[PutRoute('/{id}')]
-    public function editTerm(ServerRequestInterface $request,ResponseInterface $response, array $args) {
+    public function editTerm(ServerRequestInterface $request,ResponseInterface $response, int $id) {
 
     }
 }
