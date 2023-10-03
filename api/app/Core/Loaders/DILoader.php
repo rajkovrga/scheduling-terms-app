@@ -54,7 +54,7 @@ final class DILoader
 
         if ($env === 'production') {
 //            $builder->writeProxiesToFile(true);
-//            $builder->enableDefinitionCache(); // apcu
+            $builder->enableDefinitionCache(); // apcu
             $builder->enableCompilation($compilationPath);
         }
 

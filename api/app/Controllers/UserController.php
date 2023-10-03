@@ -13,19 +13,19 @@ use SchedulingTerms\App\Core\Routing\Attributes\PutRoute;
 #[GroupRoute('users')]
 class UserController
 {
-    #[GetRoute('')]
+    #[GetRoute('/')]
     public function getUsers(ServerRequestInterface $request,ResponseInterface $response) {
-
+        return $response->withJson([], 200);
     }
 
     #[GetRoute('/{id}')]
     public function getUser(ServerRequestInterface $request,ResponseInterface $response, int $id) {
-
+        return $response->withJson([$id], 200);
     }
 
-    #[PostRoute('')]
+    #[PostRoute('/')]
     public function createUser(ServerRequestInterface $request,ResponseInterface $response) {
-
+        return $response->withJson([], 200);
     }
 
     #[DeleteRoute('/{id}')]

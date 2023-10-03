@@ -11,7 +11,7 @@ use SchedulingTerms\App\Core\Routing\Attributes\GroupRoute;
 use SchedulingTerms\App\Core\Routing\Attributes\PostRoute;
 use SchedulingTerms\App\Core\Routing\Attributes\PutRoute;
 
-#[GroupRoute('jobs')]
+#[GroupRoute('jobs', ['auth'])]
 class JobController
 {
     public function __construct(
@@ -20,7 +20,7 @@ class JobController
     {
     }
 
-    #[GetRoute('')]
+    #[GetRoute('/',  ['auth'])]
     public function getJobs(ServerRequestInterface $request,ResponseInterface $response) {
 
     }
@@ -30,7 +30,7 @@ class JobController
         return $response->withJson($this->jobRepository->get(2), 201);
     }
 
-    #[PostRoute('')]
+    #[PostRoute('/')]
     public function createJob(ServerRequestInterface $request,ResponseInterface $response) {
 
     }

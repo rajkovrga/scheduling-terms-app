@@ -13,7 +13,7 @@ use SchedulingTerms\App\Core\Routing\Attributes\PutRoute;
 #[GroupRoute('terms')]
 class TermController
 {
-    #[GetRoute('')]
+    #[GetRoute('/')]
     public function getTerms(ServerRequestInterface $request,ResponseInterface $response) {
 
     }
@@ -23,7 +23,7 @@ class TermController
 
     }
 
-    #[PostRoute('')]
+    #[PostRoute('/')]
     public function createTerm(ServerRequestInterface $request,ResponseInterface $response) {
 
     }

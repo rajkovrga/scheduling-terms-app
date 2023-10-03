@@ -2,24 +2,12 @@
 
 namespace SchedulingTerms\App\Core;
 
-use Attribute;
 use DI\Container;
 use DI\DependencyException;
 use DI\NotFoundException;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
-use ReflectionClass;
-use ReflectionMethod;
-use SchedulingTerms\App\Core\Routing\Attributes\DeleteRoute;
-use SchedulingTerms\App\Core\Routing\Attributes\GetRoute;
-use SchedulingTerms\App\Core\Routing\Attributes\GroupRoute;
-use SchedulingTerms\App\Core\Routing\Attributes\PostRoute;
-use SchedulingTerms\App\Core\Routing\Attributes\PutRoute;
-use SchedulingTerms\App\Exceptions\MiddlewareException;
 use Slim\App;
-use Slim\Interfaces\RouteGroupInterface;
-use Slim\Routing\Route;
-use Slim\Routing\RouteCollectorProxy;
 
 class Kernel
 {
@@ -56,105 +44,16 @@ class Kernel
         }
     }
 
-    private function getControllers(string $dir = __DIR__ . '/../Controllers', array $result = []): array {
-        $controllers = array_diff(scandir($dir), ['.', '..']);
-
-        foreach ($controllers as $controller) {
-            $path = realpath($dir . '/' . $controller);
-            if(is_dir($path)) {
-                $this->getControllers($path);
-                continue;
-            }
-
-            $result[] = $path;
-        }
-
-        return $result;
-    }
-
     /**
      * @throws DependencyException
      * @throws NotFoundException
      */
-    public function routes(): Kernel
-    {
-        $controllers = $this->getControllers();
-        foreach ($controllers as $controller) {
-            if (preg_match('/Controller.php$/', $controller)) {
-                $controller = substr($controller, 0, -4);
-                $namespace = str_replace("Core", "", __NAMESPACE__) . str_replace('/', '\\', explode('app/', $controller)[1]);
-                $class = new ReflectionClass(
-                    $namespace
-                );
-
-                $attributes = $class->getAttributes(GroupRoute::class);
-                $methods = $class->getMethods();
-                if (count($attributes) > 0) {
-                    $args = $attributes[0]->getArguments();
-
-                    $group = $this->app->group(
-                        $args[0],
-                        fn(RouteCollectorProxy $group) => $this->registerRoute($methods, $namespace, $group)
-                    );
-
-                    $this->setMiddlewares($args[1] ?? [], $group);
-                    continue;
-                }
-                $this->registerRoute($methods, $namespace, $this->app, $args[1] ?? []);
-            }
-        }
-
-        return $this;
-    }
-
-
     public function run(): void
     {
         $this->setup($this->container->get(Logger::class));
+        
+        require_once __DIR__ . '/../../routes/routes.php';
+        
         $this->app->run();
     }
-
-    /**
-     * @throws MiddlewareException
-     */
-    private function setMiddlewares(array $middlewares, RouteGroupInterface|Route $group): void
-    {
-        foreach ($middlewares as $middleware) {
-            if (empty($this->middlewares[$middleware]) || !isset($this->middlewares[$middleware])) {
-                throw new MiddlewareException();
-            }
-            $group->add($this->middlewares[$middleware]);
-        }
-    }
-
-    /**
-     * @throws MiddlewareException
-     */
-    private function registerRoute(
-        array               $methods,
-        string              $namespace,
-        RouteCollectorProxy $group,
-        array               $middlewares = []
-    ): void
-    {
-        /** @var ReflectionMethod $method */
-        foreach ($methods as $method) {
-            $attributes = $method->getAttributes();
-            foreach ($attributes as $attribute) {
-                $requestType = match (true) {
-                    $attributes instanceof PostRoute => 'post',
-                    $attributes instanceof DeleteRoute => 'delete',
-                    $attributes instanceof GetRoute => 'get',
-                    $attributes instanceof PutRoute => 'put',
-                    default => null,
-                };
-
-                if ($attribute !== null) {
-                    $grp = $group->map([$requestType], $attribute->getArguments()[0], [$namespace, $method->getName()]);
-                    $this->setMiddlewares($middlewares, $grp);
-                }
-            }
-        }
-    }
-
 }

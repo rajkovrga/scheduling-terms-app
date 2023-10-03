@@ -14,27 +14,27 @@ use SchedulingTerms\App\Core\Routing\Attributes\PutRoute;
 class CompanyController
 {
 
-    #[GetRoute('')]
+    #[GetRoute('/')]
     public function getCompanies(ServerRequestInterface $request,ResponseInterface $response) {
 
     }
 
-    #[GetRoute('/{id}')]
+    #[GetRoute('{id}')]
     public function getCompany(ServerRequestInterface $request,ResponseInterface $response, int $id) {
 
     }
 
-    #[PostRoute('')]
+    #[PostRoute('/')]
     public function createCompany(ServerRequestInterface $request,ResponseInterface $response) {
 
     }
 
-    #[DeleteRoute('/{id}')]
+    #[DeleteRoute('{id}')]
     public function deleteCompany(ServerRequestInterface $request,ResponseInterface $response, int $id) {
 
     }
 
-    #[PutRoute('/{id}')]
+    #[PutRoute('{id}')]
     public function editCompany(ServerRequestInterface $request,ResponseInterface $response, int $id) {
 
     }

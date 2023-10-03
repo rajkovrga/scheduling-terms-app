@@ -2,7 +2,9 @@
 
 namespace SchedulingTerms\App\Repositories\Cached;
 
-class AuthRepository
+use SchedulingTerms\App\Contracts\Repositories\AuthRepositoryContract;
+
+class AuthRepository implements AuthRepositoryContract
 {
 
 }

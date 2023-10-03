@@ -12,7 +12,7 @@ use SchedulingTerms\App\Core\Routing\Attributes\PutRoute;
 class AuthController
 {
 
-    #[PostRoute('/login')]
+    #[PostRoute('/login', ['auth'])]
     public function login(ServerRequestInterface $request,ResponseInterface $response) {
     }
 
@@ -22,7 +22,7 @@ class AuthController
     }
 
     #[GetRoute('/me')]
-    public function me(ServerRequestInterface $request,ResponseInterface $response): ResponseInterface
+    public function me(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
         return $response->withJson([], 201);
     }

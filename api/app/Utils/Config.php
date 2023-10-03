@@ -16,7 +16,7 @@ final class Config
 
     public function __construct(public string $baseDirectory)
     {
-        $configDirectory = $this->baseDirectory . DIRECTORY_SEPARATOR . 'configurations';
+        $configDirectory = $this->baseDirectory . DIRECTORY_SEPARATOR . 'config';
 
         $dirIterator = new DirectoryIterator($configDirectory);
 
