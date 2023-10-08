@@ -1,14 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SchedulingTerms\App\Core\Routing\Attributes;
 
 use Attribute;
 use SchedulingTerms\App\Contracts\Attributes\RouteContract;
 
 #[Attribute(Attribute::TARGET_METHOD)]
-class GetRoute implements RouteContract
+readonly class GetRoute extends Route
 {
+
     public function __construct(string $path, array $middlewares = [], bool $acceptGroupMiddlewares = true)
     {
+        parent::__construct(HttpMethod::GET, $path, $middlewares, $acceptGroupMiddlewares);
     }
 }

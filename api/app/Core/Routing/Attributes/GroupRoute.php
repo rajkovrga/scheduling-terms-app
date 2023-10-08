@@ -2,12 +2,12 @@
 
 namespace SchedulingTerms\App\Core\Routing\Attributes;
 
-use SchedulingTerms\App\Contracts\Attributes\RouteGroupContract;
-
 #[\Attribute(\Attribute::TARGET_CLASS)]
-class GroupRoute implements RouteGroupContract
+class GroupRoute
 {
-    public function __construct(string $groupPath,array $middlewares = [])
-    {
+    public function __construct(
+        public readonly string $path,
+        public readonly array $middlewares = []
+    ) {
     }
 }

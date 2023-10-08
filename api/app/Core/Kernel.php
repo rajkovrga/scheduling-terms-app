@@ -1,27 +1,33 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SchedulingTerms\App\Core;
 
-use DI\Container;
-use DI\DependencyException;
-use DI\NotFoundException;
 use Monolog\Logger;
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
+use SchedulingTerms\App\Core\Routing\RoutesGenerator;
+use SchedulingTerms\App\Utils\Config;
 use Slim\App;
 
-class Kernel
+abstract class Kernel
 {
-    protected array $middlewares = [];
-    protected array $globalMiddlewares = [];
+    protected static array $middlewares = [];
+    protected static array $globalMiddlewares = [];
 
     public function __construct(
         private readonly App $app,
-        private readonly Container $container
-    )
-    {
+        private readonly ContainerInterface $container,
+        private readonly string $namespace,
+        private readonly string $baseAppPath,
+        private readonly string $controllersPath,
+        private readonly string $routePath,
+    ) {
     }
 
-    private function setup(LoggerInterface $logger = null): void {
+    private function setup(LoggerInterface $logger = null): void
+    {
         $this->app->addRoutingMiddleware();
         $this->app->addBodyParsingMiddleware();
 
@@ -31,29 +37,37 @@ class Kernel
             true
         );
 
-        $errorMiddleware->setDefaultErrorHandler(new AppErrorHandler(
-            $this->app->getCallableResolver(),
-            $this->app->getResponseFactory(),
-            $logger
-        ));
+        $errorMiddleware->setDefaultErrorHandler(
+            new AppErrorHandler(
+                $this->app->getCallableResolver(),
+                $this->app->getResponseFactory(),
+                $logger
+            )
+        );
 
-        if (!empty($this->globalMiddlewares)) {
-            foreach ($this->globalMiddlewares as $m) {
+        if (!empty(static::$globalMiddlewares)) {
+            foreach (static::$globalMiddlewares as $m) {
                 $this->app->add($m);
             }
         }
     }
 
-    /**
-     * @throws DependencyException
-     * @throws NotFoundException
-     */
     public function run(): void
     {
         $this->setup($this->container->get(Logger::class));
-        
-        require_once __DIR__ . '/../../routes/routes.php';
-        
+
+        $routerGenerator = new RoutesGenerator(
+            $this->app,
+            $this->container->get(Config::class),
+            static::$middlewares,
+            $this->namespace,
+            $this->baseAppPath,
+            $this->controllersPath,
+            $this->routePath,
+        );
+
+        $routerGenerator->generate();
+
         $this->app->run();
     }
 }

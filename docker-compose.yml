@@ -7,6 +7,8 @@ services:
             dockerfile: ./Dockerfile
         restart: unless-stopped
         container_name: api
+        environment:
+            APP_ENVIRONMENT: development
         networks:
             - net
         volumes:

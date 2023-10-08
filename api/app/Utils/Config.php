@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace SchedulingTerms\App\Utils;
@@ -21,7 +22,7 @@ final class Config
         $dirIterator = new DirectoryIterator($configDirectory);
 
         if (self::env('APP_ENVIRONMENT', 'production') !== 'production') {
-            $dotenv = Dotenv::createImmutable([$this->baseDirectory], fileEncoding: 'utf-8');
+            $dotenv = Dotenv::createImmutable([$this->baseDirectory]);
             $values = $dotenv->load();
             self::$envs = $values;
         }
@@ -29,18 +30,18 @@ final class Config
         /** @var SplFileInfo $entry */
         foreach ($dirIterator as $entry) {
             if ($entry->getExtension() === 'php') {
-                $item = require_once $configDirectory . DIRECTORY_SEPARATOR . $entry->getFilename();
-                if ($item === true) {
-                    throw new Error('File already loaded');
-                }
-
-                $this->values = array_merge($item, $this->values);
+                $item = require $configDirectory . DIRECTORY_SEPARATOR . $entry->getFilename();
+                $this->values[$entry->getBasename('.php')] = $item;
             }
         }
     }
 
-    public function get(string $cfg, mixed $default = null): mixed
+    public function get(string $cfg = '', mixed $default = null): mixed
     {
+        if (empty($cfg)) {
+            return $this->values;
+        }
+
         $values = explode('.', $cfg);
         $item = $this->values;
 
