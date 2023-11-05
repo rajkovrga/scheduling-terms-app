@@ -1,5 +1,4 @@
 <?php
-
 declare(strict_types=1);
 
 use Cake\Database\Connection;
@@ -23,8 +22,7 @@ return [
             Redis::OPT_COMPRESSION => Redis::COMPRESSION_ZSTD,
             Redis::OPT_COMPRESSION_LEVEL => (int)Config::env('REDIS_COMPRESSION_LEVEL', 6379),
             Redis::OPT_MAX_RETRIES => (int)Config::env('REDIS_MAX_RETRIES', 6379),
-            Redis::OPT_SCAN => Redis::SCAN_PREFIX,
-            Redis::OPT_NULL_MULTIBULK_AS_NULL => false
+            Redis::OPT_SCAN => Redis::SCAN_PREFIX
         ]
     ],
 

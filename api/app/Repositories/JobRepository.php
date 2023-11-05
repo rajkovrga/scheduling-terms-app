@@ -1,54 +1,77 @@
 <?php
+declare(strict_types=1);
 
 namespace SchedulingTerms\App\Repositories;
 
+use Cake\Database\Connection;
 use SchedulingTerms\App\Contracts\Repositories\JobRepositoryContract;
-use SchedulingTerms\App\Core\Data\DatabaseConnection;
+use SchedulingTerms\App\Dto\Companies\CreateUpdateCompanyDto;
 use SchedulingTerms\App\Dto\Jobs\JobDto;
+use SchedulingTerms\App\Dto\Jobs\UpdateJobDto;
 use SchedulingTerms\App\Dto\Pagination\PaginateDto;
+use SchedulingTerms\App\Exceptions\ModelNotFoundException;
 
 class JobRepository implements JobRepositoryContract
 {
-
     public function __construct(
-        private DatabaseConnection $db
+        private readonly Connection $connection
     )
     {
     }
-
-    public function create($entity)
+    
+    /**
+     * @throws ModelNotFoundException
+     */
+    public function get(int $id)
     {
-        // TODO: Implement create() method.
-    }
-
-    public function get(int $id): ?JobDto
-    {
-        $result = $this->db->executeQuery('select * from jobs where id = ?', [$id])->fetch();
-
-        if(!$result) {
-            return null;
+        $data = $this->connection->execute("select * from jobs where id = ?", [$id])->fetch();
+        
+        if(!$data) {
+            throw new ModelNotFoundException("Model not found");
         }
-
-        return JobDto::from($result);
+        
+        return JobDto::from($data);
     }
-
+    
     public function paginate(int $perPage = self::PER_PAGE): PaginateDto
     {
         // TODO: Implement paginate() method.
     }
-
+    
     public function delete(int $id): void
     {
-        // TODO: Implement delete() method.
+        $this->connection->delete('companies', ['id' => $id]);
     }
-
-    public function update(int $id, $entity)
+    
+    /**
+     * @param CreateUpdateCompanyDto $jobDto
+     * @return JobDto
+     */
+    public function create(CreateUpdateCompanyDto $jobDto): JobDto
     {
-        // TODO: Implement update() method.
+        $job = $this->connection->insert(
+            'jobs',
+            [
+                'name' => $jobDto->name,
+                'during' => $jobDto->during
+            ]
+        )->fetch();
+        
+        return JobDto::from($job);
     }
-
-    public function calculateTerms()
+    
+    /**
+     * @param UpdateJobDto $jobDto
+     * @return JobDto
+     */
+    public function update(UpdateJobDto $jobDto): JobDto
     {
-        // TODO: Implement calculateTerms() method.
+        $data = $this->connection->update(
+            'jobs',
+            ['name' => $jobDto->name],
+            ['id' => $jobDto->id]
+        )->fetch();
+        
+        return JobDto::from($data);
     }
 }

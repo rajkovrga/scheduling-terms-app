@@ -25,7 +25,7 @@ readonly class EmailService implements IEmailService
     {
         
         $email = (new Email())
-            ->from($this->config['address'])
+            ->from($this->config->get('mail.smtp.email'))
             ->to($emailAddress)
             ->subject($subject)
             ->html($message);

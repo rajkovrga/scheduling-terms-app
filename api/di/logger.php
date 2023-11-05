@@ -1,5 +1,5 @@
 <?php
-
+declare(strict_types=1);
 use DI\Container;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;

@@ -1,5 +1,5 @@
 <?php
-
+declare(strict_types=1);
 namespace SchedulingTerms\App\Exceptions;
 
 use SchedulingTerms\App\Core\AppErrorHandler;

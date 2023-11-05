@@ -1,5 +1,5 @@
 <?php
-
+declare(strict_types=1);
 namespace SchedulingTerms\App\Exceptions;
 use JetBrains\PhpStorm\Pure;
 use Throwable;

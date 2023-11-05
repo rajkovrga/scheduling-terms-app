@@ -1,5 +1,5 @@
 <?php
-
+declare(strict_types=1);
 namespace SchedulingTerms\App\Controllers;
 
 use Psr\Http\Message\ResponseInterface;
@@ -10,6 +10,7 @@ use SchedulingTerms\App\Core\Routing\Attributes\GetRoute;
 use SchedulingTerms\App\Core\Routing\Attributes\GroupRoute;
 use SchedulingTerms\App\Core\Routing\Attributes\PostRoute;
 use SchedulingTerms\App\Core\Routing\Attributes\PutRoute;
+use SchedulingTerms\App\Http\Validators\Jobs\JobRequestValidator;
 
 #[GroupRoute('jobs', ['auth'])]
 class JobController
@@ -20,7 +21,7 @@ class JobController
     {
     }
 
-    #[GetRoute('/',  ['auth'])]
+    #[GetRoute('/{cursor}',  ['auth'])]
     public function getJobs(ServerRequestInterface $request,ResponseInterface $response) {
 
     }
@@ -31,8 +32,14 @@ class JobController
     }
 
     #[PostRoute('/')]
-    public function createJob(ServerRequestInterface $request,ResponseInterface $response) {
-
+    public function createJob(JobRequestValidator $request, ResponseInterface $response) {
+        $validator = $request->validated($request['data']);
+        
+        if($validator->fails()) {
+            return $response->withJson($validator->errors(), 409);
+        }
+    
+        return $response->withJson([], 204);
     }
 
     #[DeleteRoute('/{id}')]
@@ -41,7 +48,7 @@ class JobController
     }
 
     #[PutRoute('/{id}')]
-    public function editJob(ServerRequestInterface $request,ResponseInterface $response, int $id) {
+    public function editJob(JobRequestValidator $request,ResponseInterface $response, int $id) {
 
     }
 }

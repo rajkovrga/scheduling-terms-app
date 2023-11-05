@@ -1,8 +1,8 @@
 <?php
-
+declare(strict_types=1);
 declare(strict_types=1);
 
-namespace SchedulingTerms\App\Core\Routing\Attributes;
+namespace SchedulingTerms\App\Enums;
 
 enum HttpMethod: string
 {

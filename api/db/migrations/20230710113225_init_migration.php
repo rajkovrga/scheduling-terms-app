@@ -1,5 +1,5 @@
 <?php
-
+declare(strict_types=1);
 use Phinx\Migration\AbstractMigration;
 
 class InitMigration extends AbstractMigration
@@ -48,9 +48,10 @@ class InitMigration extends AbstractMigration
             ->addForeignKey('permission_id', 'permissions', 'id', ['delete' => 'CASCADE', 'update' => 'CASCADE'])
             ->create();
 
-        $this->table('companies')->addColumn('name', 'string')
-            ->addColumn('created_at', 'datetime')
-            ->addColumn('updated_at', 'datetime')
+        $this->table('companies')
+            ->addColumn('name', 'string')
+            ->addColumn('created_at', 'timestamp', ['default' => 'CURRENT_TIMESTAMP'])
+            ->addColumn('updated_at', 'timestamp', ['null' => true])
             ->create();
 
         $this->table('jobs')
@@ -58,16 +59,17 @@ class InitMigration extends AbstractMigration
             ->addColumn('during', 'integer')
             ->addColumn('company_id', 'integer')
             ->addForeignKey('company_id', 'companies', 'id', ['delete' => 'CASCADE', 'update' => 'CASCADE'])
-            ->addColumn('created_at', 'datetime')
-            ->addColumn('updated_at', 'datetime')
+            ->addColumn('created_at', 'timestamp', ['default' => 'CURRENT_TIMESTAMP'])
+            ->addColumn('updated_at', 'timestamp', ['null' => true])
             ->create();
 
-        $this->table('users')->addColumn('name', 'string')
+        $this->table('users')
+            ->addColumn('name', 'string')
             ->addColumn('email', 'string', ['limit' => 100,])
             ->addColumn('password', 'string')
             ->addColumn('company_id', 'integer', ['null' => true])
-            ->addColumn('created_at', 'datetime')
-            ->addColumn('updated_at', 'datetime')
+            ->addColumn('created_at', 'timestamp', ['default' => 'CURRENT_TIMESTAMP'])
+            ->addColumn('updated_at', 'timestamp', ['null' => true])
             ->addColumn('role_id', 'integer')
             ->addForeignKey('company_id', 'companies', 'id', ['delete' => 'CASCADE', 'update' => 'CASCADE'])
             ->addForeignKey('role_id', 'roles', 'id', ['delete' => 'CASCADE', 'update' => 'CASCADE'])

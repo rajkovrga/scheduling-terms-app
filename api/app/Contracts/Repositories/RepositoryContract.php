@@ -1,5 +1,5 @@
 <?php
-
+declare(strict_types=1);
 namespace SchedulingTerms\App\Contracts\Repositories;
 
 use SchedulingTerms\App\Dto\Pagination\PaginateDto;
@@ -11,11 +11,7 @@ use SchedulingTerms\App\Dto\Pagination\PaginateDto;
 interface RepositoryContract
 {
     public const PER_PAGE = 10;
-    /**
-     * @param $entity TCreate
-     * @return T
-     */
-    public function create($entity);
+
     public function get(int $id);
 
     /**
@@ -24,10 +20,4 @@ interface RepositoryContract
      */
     public function paginate(int $perPage = self::PER_PAGE): PaginateDto;
     public function delete(int $id): void;
-
-    /**
-     * @param $entity T
-     * @return T
-     */
-    public function update(int $id, $entity);
 }

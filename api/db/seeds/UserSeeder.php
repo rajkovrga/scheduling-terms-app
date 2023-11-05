@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Faker\Factory;
 use Phinx\Seed\AbstractSeed;
 use SchedulingTerms\App\Utils\Roles;
@@ -28,17 +30,12 @@ class UserSeeder extends AbstractSeed
         $this->execute('delete from users');
 
         $faker = Factory::create();
-        $format = 'Y-m-d\TH:i:sP';
-
         $superAdminId = $this->adapter->fetchRow("SELECT * FROM roles where name = '". Roles::SuperAdmin ."'")['id'];
 
         $users[] = [
-            'name' => 'rajkovrga',
             'email' => 'rajko@vrga.dev',
             'password' => password_hash('password', PASSWORD_ARGON2I),
             'company_id' => null,
-            'created_at' => date($format),
-            'updated_at' => date($format),
             'role_id' => $superAdminId
         ];
 
@@ -46,15 +43,11 @@ class UserSeeder extends AbstractSeed
         $roleIds = array_map(function($item) {
             return $item['id'];
         }, $roles);
-
-
+        
         for ($i = 2; $i < 100; $i++) {
             $users[] = [
-                'name' => $faker->userName,
                 'email' => $faker->email,
                 'password' =>  password_hash('password', PASSWORD_ARGON2I),
-                'created_at' => date($format),
-                'updated_at' => date($format),
                 'company_id' => rand(1,10),
                 'role_id' => $roleIds[array_rand($roleIds)]
             ];

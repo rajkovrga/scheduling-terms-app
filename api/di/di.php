@@ -2,9 +2,13 @@
 declare(strict_types=1);
 
 use Cake\Database\Connection;
+use Cake\Datasource\ConnectionInterface;
 use Psr\Container\ContainerInterface as Container;
+use SchedulingTerms\App\Contracts\Repositories\CompanyRepositoryContract;
 use SchedulingTerms\App\Contracts\Repositories\JobRepositoryContract;
+use SchedulingTerms\App\Controllers\CompanyController;
 use SchedulingTerms\App\Controllers\JobController;
+use SchedulingTerms\App\Repositories\CompanyRepository;
 use SchedulingTerms\App\Repositories\JobRepository;
 use Cake\Datasource\ConnectionManager;
 use SchedulingTerms\App\Utils\Config;
@@ -33,10 +37,16 @@ return [
         $transport = Transport::fromDsn("gmail+smtp://{$config['username']}:{$config['password']}@default");
         return new Mailer($transport);
     },
-    JobRepositoryContract::class => static function (Container $container) {
-        return new JobRepository($container->get(PDOStatement::class));
+//    JobRepositoryContract::class => static function (Container $container) {
+//        return new JobRepository($container->get(Connection::class));
+//    },
+//    JobController::class => static function (Container $container) {
+//        return new JobController($container->get(JobRepositoryContract::class));
+//    },
+    CompanyRepositoryContract::class => static function (Container $container) {
+        return new CompanyRepository($container->get(Connection::class));
     },
-    JobController::class => static function (Container $container) {
-        return new JobController($container->get(JobRepositoryContract::class));
+    CompanyController::class => static function (Container $container) {
+        return new CompanyController($container->get(CompanyRepositoryContract::class));
     },
 ];

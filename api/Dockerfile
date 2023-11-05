@@ -16,7 +16,7 @@ USER root
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
 RUN apt update -y && apt upgrade -y \
-    && install-php-extensions intl zip bcmath pdo_pgsql pcntl gmp opcache uuid amqp json_post igbinary ast redis apcu \
+    && install-php-extensions intl zip bcmath pgsql pdo_pgsql pcntl gmp opcache uuid amqp json_post igbinary ast redis apcu \
     && php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
     && php composer-setup.php --install-dir=/bin --filename=composer \
     && php -r "unlink('composer-setup.php');"

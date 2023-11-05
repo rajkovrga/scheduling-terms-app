@@ -16,7 +16,7 @@ environments:
 
     development:
         adapter: pgsql
-        host: 172.25.0.4
+        host: postgres
         name: termsDb
         user: root
         pass: root
