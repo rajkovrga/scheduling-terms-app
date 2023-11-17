@@ -5,13 +5,13 @@ namespace SchedulingTerms\App\Repositories;
 use Redis;
 use RedisException;
 use SchedulingTerms\App\Contracts\Repositories\RepositoryContract;
-use SchedulingTerms\App\Dto\Pagination\PaginateDto;
+use SchedulingTerms\App\Helpers\Cache;
 
 class CachedRepository implements RepositoryContract
 {
     public function __construct(
         private readonly RepositoryContract $repository,
-        private readonly Redis $redis
+        private readonly Cache $redis
     )
     {
     
@@ -30,14 +30,10 @@ class CachedRepository implements RepositoryContract
         
         return $data;
     }
-    protected function getCacheKey(...$args): string
-    {
-        return '';
-    }
     
     public function paginate(int $perPage = self::PER_PAGE): array
     {
-        return $this->repositoryContract->paginate($perPage);
+        return $this->repository->paginate($perPage);
     }
     
     /**
@@ -45,7 +41,7 @@ class CachedRepository implements RepositoryContract
      */
     public function delete(int $id): void
     {
-        $this->repositoryContract->delete($id);
-        $this->redis->del($id);
+        $this->repository->delete($id);
+        $this->redis->delete((string)$id);
     }
 }

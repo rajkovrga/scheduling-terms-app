@@ -2,95 +2,143 @@
 
 namespace SchedulingTerms\App\Helpers;
 
+use Carbon\CarbonInterval;
+use DateInterval;
 use Psr\SimpleCache\CacheInterface;
 use Redis;
 use RedisException;
 
 class Cache implements CacheInterface
 {
-    
     public function __construct(
-        private Redis $redis
+        private readonly Redis   $redis,
+        protected CarbonInterval $cacheDuration,
+        protected string         $cachePrefix,
     )
     {
     }
-    
+
     /**
-     * @param string $key
-     * @param mixed|null $default
-     * @return mixed
+     * @throws RedisException
      */
-    public function get(string $key, mixed $default = null)
+    public function get(string $key, mixed $default = null): mixed
     {
-        // TODO: Implement get() method.
+        $cacheKey = $this->getCacheKey($key);
+        $value = $this->redis->get($cacheKey);
+
+        if ($value === null) {
+            return $default;
+        }
+
+        return $value;
     }
-    
+
     /**
-     * @param string $key
-     * @param mixed $value
-     * @param int|\DateInterval|null $ttl
-     * @return bool
+     * @throws RedisException
      */
-    public function set(string $key, mixed $value, \DateInterval|int|null $ttl = null)
+    public function set(string $key, mixed $value, \DateInterval|int|null $ttl = null): bool
     {
-        // TODO: Implement set() method.
+        $cacheKey = $this->getCacheKey($key);
+        return $this->redis->setex($cacheKey, $this->cacheDuration->totalSeconds, $value) == 'OK';
     }
-    
+
     /**
-     * @param string $key
-     * @return bool
+     * @throws RedisException
      */
-    public function delete(string $key)
+    public function delete(string $key): void
     {
-        // TODO: Implement delete() method.
+        $cacheKey = $this->getCacheKey($key);
+        $this->redis->del($cacheKey);
     }
-    
+
     /**
-     * @return bool
+     * @throws RedisException
      */
-    public function clear()
+    public function clear(): void
     {
-        // TODO: Implement clear() method.
+        $iterator = null;
+        $keys = [];
+
+        do {
+            [$iterator, $currentKeys] = $this->redis->scan($iterator, ['MATCH' => $this->cachePrefix . '.*']);
+            $keys = array_merge($keys, $currentKeys);
+        } while ($iterator !== 0);
+
+        if (!empty($keys)) {
+            $this->redis->del($keys);
+        }
     }
-    
+
     /**
-     * @param iterable $keys
-     * @param mixed|null $default
-     * @return mixed[]
+     * @throws RedisException
      */
-    public function getMultiple(iterable $keys, mixed $default = null)
+    public function getMultiple(iterable $keys, mixed $default = null): iterable
     {
-        // TODO: Implement getMultiple() method.
+        $results = [];
+
+        foreach ($keys as $key) {
+            $cacheKey = $this->getCacheKey($key);
+            $value = $this->redis->get($cacheKey);
+
+            if ($value === null) {
+                $results[$key] = $default;
+            } else {
+                $results[$key] = $value;
+            }
+        }
+
+        return $results;
     }
-    
+
     /**
-     * @param iterable $values
-     * @param int|\DateInterval|null $ttl
-     * @return bool
+     * @throws RedisException
      */
-    public function setMultiple(iterable $values, \DateInterval|int|null $ttl = null)
+    public function setMultiple(iterable $values, DateInterval|int|null $ttl = null): bool
     {
-        // TODO: Implement setMultiple() method.
+        $success = true;
+
+        foreach ($values as $key => $value) {
+            $cacheKey = $this->getCacheKey($key);
+
+            if (!$this->set($cacheKey, $value, $ttl)) {
+                $success = false;
+            }
+        }
+
+        return $success;
     }
-    
+
     /**
-     * @param iterable $keys
-     * @return bool
      * @throws RedisException
      */
     public function deleteMultiple(iterable $keys): bool
     {
-        $keys = iterator_to_array($keys);
-        return (bool)$this->redis->del($keys);
+        $success = true;
+
+        foreach ($keys as $key) {
+            $cacheKey = $this->getCacheKey($key);
+
+            if (!$this->redis->del($cacheKey)) {
+                $success = false;
+            }
+        }
+
+        return $success;
     }
-    
+
     /**
-     * @param string $key
-     * @return bool
      * @throws RedisException
      */
     public function has(string $key): bool
     {
-        return $this->redis->get($key) !== false;
+        $cacheKey = $this->getCacheKey($key);
+        return $this->redis->exists($cacheKey);
     }
+
+
+    private function getCacheKey(string $key): string
+    {
+        return $this->cachePrefix . $key;
+    }
+
 }

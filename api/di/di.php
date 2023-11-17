@@ -2,20 +2,24 @@
 declare(strict_types=1);
 
 use Cake\Database\Connection;
-use Cake\Datasource\ConnectionInterface;
 use Psr\Container\ContainerInterface as Container;
 use SchedulingTerms\App\Contracts\Repositories\CompanyRepositoryContract;
 use SchedulingTerms\App\Contracts\Repositories\JobRepositoryContract;
 use SchedulingTerms\App\Contracts\Repositories\TermsRepositoryContract;
+use SchedulingTerms\App\Contracts\Repositories\TokenRepositoryContract;
 use SchedulingTerms\App\Contracts\Repositories\UserRepositoryContract;
-use SchedulingTerms\App\Controllers\CompanyController;
 use SchedulingTerms\App\Controllers\JobController;
-use SchedulingTerms\App\Controllers\TermController;
-use SchedulingTerms\App\Controllers\UserController;
+use SchedulingTerms\App\Helpers\Cache;
+use Cake\Datasource\ConnectionManager;
+use SchedulingTerms\App\Repositories\Cached\CompanyRepository as CacheCompanyRepository;
+use SchedulingTerms\App\Repositories\Cached\TokenRepository as TokenCacheRepository;
+use SchedulingTerms\App\Repositories\Cached\UserRepository as CacheUserRepository;
+use SchedulingTerms\App\Repositories\Cached\TermRepository as CacheTermRepository;
+use SchedulingTerms\App\Repositories\Cached\JobRepository as CacheJobRepository;
 use SchedulingTerms\App\Repositories\CompanyRepository;
 use SchedulingTerms\App\Repositories\JobRepository;
-use Cake\Datasource\ConnectionManager;
 use SchedulingTerms\App\Repositories\TermRepository;
+use SchedulingTerms\App\Repositories\TokenRepository;
 use SchedulingTerms\App\Repositories\UserRepository;
 use SchedulingTerms\App\Utils\Config;
 use Symfony\Component\Mailer\Mailer;
@@ -43,28 +47,62 @@ return [
         $transport = Transport::fromDsn("gmail+smtp://{$config['username']}:{$config['password']}@default");
         return new Mailer($transport);
     },
-    JobRepositoryContract::class => static function (Container $container) {
-        return new JobRepository($container->get(Connection::class));
-    },
-    JobController::class => static function (Container $container) {
-        return new JobController($container->get(JobRepositoryContract::class));
-    },
     CompanyRepositoryContract::class => static function (Container $container) {
-        return new CompanyRepository($container->get(Connection::class));
-    },
-    CompanyController::class => static function (Container $container) {
-        return new CompanyController($container->get(CompanyRepositoryContract::class));
-    },
-    TermsRepositoryContract::class => static function (Container $container) {
-        return new TermRepository($container->get(Connection::class));
-    },
-    TermController::class => static function (Container $container) {
-        return new TermController($container->get(TermsRepositoryContract::class));
+        new CacheCompanyRepository(
+            new CompanyRepository(
+                $container->get(Connection::class)),
+            new Cache(
+                $container->get(Redis::class),
+                $container->get('company.cache_duration'),
+                $container->get('company.cache_prefix')
+            )
+        );
     },
     UserRepositoryContract::class => static function (Container $container) {
-        return new UserRepository($container->get(Connection::class));
+        new CacheUserRepository(
+            new UserRepository(
+                $container->get(Connection::class)),
+            new Cache(
+                $container->get(Redis::class),
+                $container->get('user.cache_duration'),
+                $container->get('user.cache_prefix')
+            )
+        );
     },
-    UserController::class => static function (Container $container) {
-        return new UserController($container->get(UserRepositoryContract::class));
+    TermsRepositoryContract::class => static function (Container $container) {
+        new CacheTermRepository(
+            new TermRepository(
+                $container->get(Connection::class)),
+            new Cache(
+                $container->get(Redis::class),
+                $container->get('term.cache_duration'),
+                $container->get('term.cache_prefix')
+            )
+        );
+    },
+    TokenRepositoryContract::class => static function (Container $container) {
+        new TokenCacheRepository(
+            new TokenRepository(
+                $container->get(Connection::class)),
+            new Cache(
+                $container->get(Redis::class),
+                $container->get('token.cache_duration'),
+                $container->get('token.cache_prefix')
+            )
+        );
+    },
+    JobRepositoryContract::class => static function (Container $container) {
+        new CacheJobRepository(
+            new JobRepository(
+                $container->get(Connection::class)),
+            new Cache(
+                $container->get(Redis::class),
+                $container->get('job.cache_duration'),
+                $container->get('job.cache_prefix')
+            )
+        );
+    },
+    JobController::class => static function (Container $container) {
+//:TODO 
     }
 ];

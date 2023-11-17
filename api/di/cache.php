@@ -20,4 +20,8 @@ return [
         'cache_prefix' => 'users',
         'cache_duration' => CarbonInterval::hours(8),
     ],
+    'token' => [
+        'cache_prefix' => 'tokens',
+        'cache_duration' => CarbonInterval::month(8),
+    ],
 ];
