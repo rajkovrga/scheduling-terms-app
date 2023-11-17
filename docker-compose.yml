@@ -13,6 +13,8 @@ services:
             - net
         volumes:
             - ./api:/var/www/html
+        extra_hosts:
+            - 'host.docker.internal:host-gateway'
     nginx:
         image:  nginx:latest
         restart: unless-stopped

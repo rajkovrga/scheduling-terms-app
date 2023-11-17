@@ -31,7 +31,6 @@ class JobsSeeder extends AbstractSeed
 
         for ($i = 1; $i < 200; $i++) {
             $jobs[] = [
-                'id' => $i,
                 'name' => $faker->jobTitle(),
                 'during' => rand(10, 120),
                 'company_id' => rand(1,10),

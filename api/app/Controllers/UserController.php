@@ -4,45 +4,87 @@ namespace SchedulingTerms\App\Controllers;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use SchedulingTerms\App\Contracts\Repositories\UserRepositoryContract;
 use SchedulingTerms\App\Core\Routing\Attributes\DeleteRoute;
 use SchedulingTerms\App\Core\Routing\Attributes\GetRoute;
 use SchedulingTerms\App\Core\Routing\Attributes\GroupRoute;
 use SchedulingTerms\App\Core\Routing\Attributes\PostRoute;
 use SchedulingTerms\App\Core\Routing\Attributes\PutRoute;
+use SchedulingTerms\App\Dto\Users\CreateUpdateUserDto;
 use SchedulingTerms\App\Http\Resources\Users\UserResource;
 use SchedulingTerms\App\Http\Validators\Users\UserRequestValidator;
+use SchedulingTerms\App\Models\User;
 
-#[GroupRoute('users')]
-class UserController
+#[GroupRoute('/users')]
+readonly class UserController
 {
-    #[GetRoute('/{cursor}')]
+    public function __construct(
+        public UserRepositoryContract $userRepository
+    )
+    {
+    }
+    #[GetRoute('/paginate/{cursor}')]
     public function getUsers(ServerRequestInterface $request,ResponseInterface $response, ?string $cursor = null) {
         return $response->withJson([], 200);
     }
 
     #[GetRoute('/{id}')]
     public function getUser(ServerRequestInterface $request,ResponseInterface $response, int $id) {
-        return $response->withJson([$id], 200);
+        // TODO: check permission
+        /** @var User $user */
+        $user = $this->userRepository->get($id);
+    
+        return $response->withJson((new UserResource($user))->toArray($request), 200);
     }
 
-    #[PostRoute('/')]
-    public function createUser(UserRequestValidator $request,ResponseInterface $response) {
-        $validator = $request->validated($request['data']);
-        
-        if($validator->fails()) {
-            return $response->withJson($validator->errors(), 409);
+    #[PostRoute('')]
+    public function createUser(ServerRequestInterface $request,ResponseInterface $response) {
+        // TODO: check permission
+        $data = $request->getParsedBody();
+    
+        $validator = new UserRequestValidator($request);
+        $result = $validator->validated($data);
+    
+        if($result->fails()) {
+            return $response->withJson($result->errors()->toArray(), 409);
         }
     
-        return $response->withJson([], 204);
+        $term = $this->userRepository->create(new CreateUpdateUserDto(
+            $data['email'],
+            $data['company_id'],
+            $data['password'],
+            $data['role_id'],
+        ));
+    
+        return $response->withJson((new UserResource($term))->toArray($request), 201);
     }
 
     #[DeleteRoute('/{id}')]
-    public function deleteUser(ServerRequestInterface $request,ResponseInterface $response, int $id) {
-
+    public function deleteUser(ServerRequestInterface $request ,ResponseInterface $response, int $id): ResponseInterface
+    {
+        $this->userRepository->delete($id);
+    
+        return $response->withStatus(204);
     }
 
     #[PutRoute('/{id}')]
-    public function editUser(UserRequestValidator $request,ResponseInterface $response, int $id) {
-
+    public function editUser(ServerRequestInterface $request,ResponseInterface $response, int $id) {
+        $data = $request->getParsedBody();
+    
+        $validator = new UserRequestValidator($request);
+        $result = $validator->validated($data);
+    
+        if($result->fails()) {
+            return $response->withJson($result->errors()->toArray(), 409);
+        }
+    
+        $user = $this->userRepository->update($id, new CreateUpdateUserDto(
+            $data['email'],
+            $data['company_id'],
+            null,
+            $data['role_id'],
+        ));
+    
+        return $response->withJson((new UserResource($user))->toArray($request), 200);
     }
 }

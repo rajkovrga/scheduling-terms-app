@@ -2,15 +2,15 @@
 
 namespace SchedulingTerms\App\Models;
 
-class Job
+readonly class Job
 {
     public function __construct(
-        public readonly int $id,
-        public readonly string $name,
-        public readonly int $during,
-        public readonly int $companyId,
-        public readonly string $createdAt,
-        public readonly string $updateAt
+        public int     $id,
+        public string  $name,
+        public int     $during,
+        public ?Company     $company,
+        public string  $createdAt,
+        public ?string $updatedAt
     )
     {
     }

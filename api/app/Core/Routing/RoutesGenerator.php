@@ -8,6 +8,7 @@ use FilesystemIterator;
 use Generator;
 use RecursiveDirectoryIterator;
 use ReflectionClass;
+use ReflectionException;
 use ReflectionMethod;
 use RuntimeException;
 use SchedulingTerms\App\Core\Routing\Attributes\DeleteRoute;
@@ -125,10 +126,13 @@ readonly class RoutesGenerator
                 false => $middleware,
             };
 
-            yield "\n\t->add(\"$md\")";
+            yield "\n\t->add(new $md())";
         }
     }
-
+    
+    /**
+     * @throws ReflectionException
+     */
     public function generate(): void
     {
         $app = $this->router;

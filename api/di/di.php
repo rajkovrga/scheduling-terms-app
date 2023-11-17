@@ -6,11 +6,17 @@ use Cake\Datasource\ConnectionInterface;
 use Psr\Container\ContainerInterface as Container;
 use SchedulingTerms\App\Contracts\Repositories\CompanyRepositoryContract;
 use SchedulingTerms\App\Contracts\Repositories\JobRepositoryContract;
+use SchedulingTerms\App\Contracts\Repositories\TermsRepositoryContract;
+use SchedulingTerms\App\Contracts\Repositories\UserRepositoryContract;
 use SchedulingTerms\App\Controllers\CompanyController;
 use SchedulingTerms\App\Controllers\JobController;
+use SchedulingTerms\App\Controllers\TermController;
+use SchedulingTerms\App\Controllers\UserController;
 use SchedulingTerms\App\Repositories\CompanyRepository;
 use SchedulingTerms\App\Repositories\JobRepository;
 use Cake\Datasource\ConnectionManager;
+use SchedulingTerms\App\Repositories\TermRepository;
+use SchedulingTerms\App\Repositories\UserRepository;
 use SchedulingTerms\App\Utils\Config;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\Transport;
@@ -37,16 +43,28 @@ return [
         $transport = Transport::fromDsn("gmail+smtp://{$config['username']}:{$config['password']}@default");
         return new Mailer($transport);
     },
-//    JobRepositoryContract::class => static function (Container $container) {
-//        return new JobRepository($container->get(Connection::class));
-//    },
-//    JobController::class => static function (Container $container) {
-//        return new JobController($container->get(JobRepositoryContract::class));
-//    },
+    JobRepositoryContract::class => static function (Container $container) {
+        return new JobRepository($container->get(Connection::class));
+    },
+    JobController::class => static function (Container $container) {
+        return new JobController($container->get(JobRepositoryContract::class));
+    },
     CompanyRepositoryContract::class => static function (Container $container) {
         return new CompanyRepository($container->get(Connection::class));
     },
     CompanyController::class => static function (Container $container) {
         return new CompanyController($container->get(CompanyRepositoryContract::class));
     },
+    TermsRepositoryContract::class => static function (Container $container) {
+        return new TermRepository($container->get(Connection::class));
+    },
+    TermController::class => static function (Container $container) {
+        return new TermController($container->get(TermsRepositoryContract::class));
+    },
+    UserRepositoryContract::class => static function (Container $container) {
+        return new UserRepository($container->get(Connection::class));
+    },
+    UserController::class => static function (Container $container) {
+        return new UserController($container->get(UserRepositoryContract::class));
+    }
 ];

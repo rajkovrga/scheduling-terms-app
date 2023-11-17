@@ -32,29 +32,38 @@ class InitMigration extends AbstractMigration
      */
     public function change()
     {
-
-        $this->table('roles')
+        $roles = $this->table('roles', ['id' => false, 'primary_key' => 'id']);
+        $roles
+            ->addColumn('id', 'biginteger', ['identity' => true, 'signed' => false])
             ->addColumn('name', 'string')
             ->create();
-
-        $this->table('permissions')
+    
+        $permissions = $this->table('permissions', ['id' => false, 'primary_key' => 'id']);
+        $permissions
+            ->addColumn('id', 'biginteger', ['identity' => true, 'signed' => false])
             ->addColumn('name', 'string')
             ->create();
-
-        $this->table('role_permission')
+    
+        $rolePermission = $this->table('role_permission', ['id' => true, 'primary_key' => 'id']);
+        $rolePermission
             ->addColumn('role_id', 'integer')
             ->addColumn('permission_id', 'integer')
             ->addForeignKey('role_id', 'roles', 'id', ['delete' => 'CASCADE', 'update' => 'CASCADE'])
             ->addForeignKey('permission_id', 'permissions', 'id', ['delete' => 'CASCADE', 'update' => 'CASCADE'])
             ->create();
-
-        $this->table('companies')
+    
+        $companies = $this->table('companies', ['id' => false, 'primary_key' => 'id']);
+        $companies
+            ->addColumn('id', 'biginteger', ['identity' => true, 'signed' => false])
             ->addColumn('name', 'string')
             ->addColumn('created_at', 'timestamp', ['default' => 'CURRENT_TIMESTAMP'])
             ->addColumn('updated_at', 'timestamp', ['null' => true])
+            ->addIndex(['id'], ['unique' => true])  // Ovo će dodati unique constraint na 'id'
             ->create();
-
-        $this->table('jobs')
+    
+        $jobs = $this->table('jobs', ['id' => false, 'primary_key' => 'id']);
+        $jobs
+            ->addColumn('id', 'biginteger', ['identity' => true, 'signed' => false])
             ->addColumn('name', 'string')
             ->addColumn('during', 'integer')
             ->addColumn('company_id', 'integer')
@@ -62,9 +71,10 @@ class InitMigration extends AbstractMigration
             ->addColumn('created_at', 'timestamp', ['default' => 'CURRENT_TIMESTAMP'])
             ->addColumn('updated_at', 'timestamp', ['null' => true])
             ->create();
-
-        $this->table('users')
-            ->addColumn('name', 'string')
+    
+        $users = $this->table('users', ['id' => false, 'primary_key' => 'id']);
+        $users
+            ->addColumn('id', 'biginteger', ['identity' => true, 'signed' => false])
             ->addColumn('email', 'string', ['limit' => 100,])
             ->addColumn('password', 'string')
             ->addColumn('company_id', 'integer', ['null' => true])
@@ -76,13 +86,14 @@ class InitMigration extends AbstractMigration
             ->addIndex(['email'], ['unique' => true])
             ->addIndex(['password'])
             ->addIndex(['role_id'])
-            ->addIndex(['name'])
             ->create();
-
-            $this->table('terms')
+    
+        $terms = $this->table('terms', ['id' => false, 'primary_key' => 'id']);
+        $terms
+            ->addColumn('id', 'biginteger', ['identity' => true, 'signed' => false])
             ->addColumn('user_id', 'integer')
-            ->addColumn('start_date', 'date')
-            ->addColumn('end_date', 'date')
+            ->addColumn('start_date', 'datetime')
+            ->addColumn('end_date', 'datetime')
             ->addColumn('job_id', 'integer')
             ->addColumn('company_id', 'integer')
             ->addForeignKey('user_id', 'users', 'id', ['delete' => 'CASCADE', 'update' => 'CASCADE'])

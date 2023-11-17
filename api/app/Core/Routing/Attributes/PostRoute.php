@@ -1,6 +1,5 @@
 <?php
 declare(strict_types=1);
-declare(strict_types=1);
 
 namespace SchedulingTerms\App\Core\Routing\Attributes;
 
@@ -13,6 +12,6 @@ readonly class PostRoute extends Route
 {
     public function __construct(string $path, array $middlewares = [], bool $acceptGroupMiddlewares = true)
     {
-        parent::__construct(HttpMethod::PUT, $path, $middlewares, $acceptGroupMiddlewares);
+        parent::__construct(HttpMethod::POST, $path, $middlewares, $acceptGroupMiddlewares);
     }
 }

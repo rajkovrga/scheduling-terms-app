@@ -2,7 +2,6 @@
 declare(strict_types=1);
 namespace SchedulingTerms\App\Contracts\Repositories;
 
-use SchedulingTerms\App\Dto\Pagination\PaginateDto;
 
 /**
  * @template T
@@ -13,11 +12,11 @@ interface RepositoryContract
     public const PER_PAGE = 10;
 
     public function get(int $id);
-
+    
     /**
      * @param int $perPage
-     * @return PaginateDto<T>
+     * @return array<T>
      */
-    public function paginate(int $perPage = self::PER_PAGE): PaginateDto;
+    public function paginate(int $perPage = self::PER_PAGE): array;
     public function delete(int $id): void;
 }

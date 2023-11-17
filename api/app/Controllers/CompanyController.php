@@ -2,7 +2,6 @@
 declare(strict_types=1);
 namespace SchedulingTerms\App\Controllers;
 
-use Cake\Database\Type\JsonType;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use SchedulingTerms\App\Contracts\Repositories\CompanyRepositoryContract;
@@ -11,11 +10,10 @@ use SchedulingTerms\App\Core\Routing\Attributes\GetRoute;
 use SchedulingTerms\App\Core\Routing\Attributes\GroupRoute;
 use SchedulingTerms\App\Core\Routing\Attributes\PostRoute;
 use SchedulingTerms\App\Core\Routing\Attributes\PutRoute;
-use SchedulingTerms\App\Dto\Companies\CompanyDto;
 use SchedulingTerms\App\Dto\Companies\CreateUpdateCompanyDto;
-use SchedulingTerms\App\Dto\Companies\UpdateCompanyDto;
 use SchedulingTerms\App\Http\Resources\Companies\CompanyResource;
 use SchedulingTerms\App\Http\Validators\Companies\CompanyRequestValidator;
+use SchedulingTerms\App\Models\Company;
 
 #[GroupRoute('/companies')]
 class CompanyController
@@ -26,7 +24,7 @@ class CompanyController
     {
     }
     
-    #[GetRoute('/{cursor}')]
+    #[GetRoute('/paginate/{cursor}')]
     public function getCompanies(ServerRequestInterface $request,ResponseInterface $response): ResponseInterface {
 
         return $response;
@@ -34,45 +32,50 @@ class CompanyController
 
     #[GetRoute('/{id}')]
     public function getCompany(ServerRequestInterface $request,ResponseInterface $response, int $id): ResponseInterface {
-        
         // TODO: check permission
-        /** @var CompanyDto $company */
+        /** @var Company $company */
         $company = $this->companyRepository->get($id);
     
-        return $response->withJson(CompanyResource::toArray($company), 200);
+        return $response->withJson((new CompanyResource($company))->toArray($request), 200);
     }
 
-    #[PostRoute('/')]
-    public function createCompany(CompanyRequestValidator $request, ResponseInterface $response): ResponseInterface {
+    #[PostRoute('')]
+    public function createCompany(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface {
         // TODO: check permission
+        $data = $request->getParsedBody();
         
-        $validator = $request->validated($request['data']);
+        $validator = new CompanyRequestValidator($request);
+        $result = $validator->validated($data);
         
-        if($validator->fails()) {
-            return $response->withJson($validator->errors(), 409);
+        if($result->fails()) {
+            return $response->withJson($result->errors()->toArray(), 409);
         }
         
-        $company = $this->companyRepository->create(CreateUpdateCompanyDto::from($request['data']));
+        $company = $this->companyRepository->create(new CreateUpdateCompanyDto($data['name']));
         
-        return $response->withJson($company, 201);
+        return $response->withJson((new CompanyResource($company))->toArray($request), 201);
     }
 
-    #[DeleteRoute('{id}')]
-    public function deleteCompany(ServerRequestInterface $request,ResponseInterface $response, int $id): ResponseInterface {
+    #[DeleteRoute('/{id}')]
+    public function deleteCompany(ServerRequestInterface $request, ResponseInterface $response, int $id): ResponseInterface {
+         $this->companyRepository->delete($id);
     
-        return $response;
+        return $response->withStatus(204);
     }
 
-    #[PutRoute('{id}')]
-    public function editCompany(CompanyRequestValidator $request,ResponseInterface $response, int $id): ResponseInterface {
-        $validator = $request->validated($request['data']);
+    #[PutRoute('/{id}')]
+    public function editCompany(ServerRequestInterface $request,ResponseInterface $response, int $id): ResponseInterface {
+        $data = $request->getParsedBody();
     
-        if($validator->fails()) {
-            return $response->withJson($validator->errors(), 409);
+        $validator = new CompanyRequestValidator($request);
+        $result = $validator->validated($data);
+        
+        if($result->fails()) {
+            return $response->withJson($result->errors()->toArray(), 409);
         }
     
-        $company = $this->companyRepository->update($id, UpdateCompanyDto::from($request['data']));
+        $company = $this->companyRepository->update($id, new CreateUpdateCompanyDto($data['name']));
     
-        return $response->withJson($company, 204);
+        return $response->withJson((new CompanyResource($company))->toArray($request), 200);
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace SchedulingTerms\App\Core;
@@ -14,7 +15,7 @@ abstract class Kernel
 {
     protected static array $middlewares = [];
     protected static array $globalMiddlewares = [];
-
+    
     public function __construct(
         private readonly App $app,
         private readonly ContainerInterface $container,
@@ -24,18 +25,18 @@ abstract class Kernel
         private readonly string $routePath,
     ) {
     }
-
+    
     private function setup(LoggerInterface $logger = null): void
     {
         $this->app->addRoutingMiddleware();
         $this->app->addBodyParsingMiddleware();
-
+        
         $errorMiddleware = $this->app->addErrorMiddleware(
             true,
             true,
             true
         );
-
+        
         $errorMiddleware->setDefaultErrorHandler(
             new AppErrorHandler(
                 $this->app->getCallableResolver(),
@@ -43,18 +44,18 @@ abstract class Kernel
                 $logger
             )
         );
-
+        
         if (!empty(static::$globalMiddlewares)) {
             foreach (static::$globalMiddlewares as $m) {
                 $this->app->add($m);
             }
         }
     }
-
+    
     public function run(): void
     {
         $this->setup($this->container->get(Logger::class));
-
+        
         $routerGenerator = new RoutesGenerator(
             $this->app,
             $this->container->get(Config::class),
@@ -64,9 +65,9 @@ abstract class Kernel
             $this->controllersPath,
             $this->routePath,
         );
-
+        
         $routerGenerator->generate();
-
+        
         $this->app->run();
     }
 }

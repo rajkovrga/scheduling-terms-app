@@ -24,7 +24,6 @@ class CompaniesSeeder extends AbstractSeed
 
         for ($i = 1; $i < 11; $i++) {
             $companies[] = [
-                'id' => $i,
                 'name' => $faker->company(),
             ];
         }

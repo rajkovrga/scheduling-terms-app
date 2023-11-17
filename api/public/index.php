@@ -4,7 +4,6 @@ declare(strict_types=1);
 use DI\Bridge\Slim\Bridge;
 use SchedulingTerms\App\Core\Loaders\DILoader;
 use SchedulingTerms\App\Kernel;
-
 require_once __DIR__ . '/../vendor/autoload.php';
 
 define('APP_BASE_PATH', dirname(__DIR__));

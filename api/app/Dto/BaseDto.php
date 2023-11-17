@@ -8,12 +8,12 @@ use DateTimeInterface;
 
 abstract class BaseDto
 {
-    protected function parseDateTime(string $key): ?CarbonImmutable
+    protected function parseDateTime(string $data): ?CarbonImmutable
     {
-        return array_key_exists($key, $this->data) && $this->data[$key] !== null ? CarbonImmutable::createFromFormat(
+        return CarbonImmutable::createFromFormat(
             static::dateFormat(),
-            $this->data[$key]
-        )->shiftTimezone('UTC') : null;
+            $data
+        )->shiftTimezone('UTC');
     }
     
     public static function dateFormat(): string

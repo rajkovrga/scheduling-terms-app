@@ -2,13 +2,13 @@
 
 namespace SchedulingTerms\App\Models;
 
-class Company
+readonly class Company
 {
     public function __construct(
-        public readonly int $id,
-        public readonly string $name,
-        public readonly string $createdAt,
-        public readonly string $updatedAt
+        public ?int     $id,
+        public ?string  $name,
+        public ?string  $createdAt,
+        public ?string $updatedAt
     )
     {
     }

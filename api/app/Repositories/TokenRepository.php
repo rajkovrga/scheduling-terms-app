@@ -5,7 +5,6 @@ namespace SchedulingTerms\App\Repositories;
 
 use SchedulingTerms\App\Contracts\Repositories\RepositoryContract;
 use SchedulingTerms\App\Contracts\Repositories\TokenRepositoryContract;
-use SchedulingTerms\App\Dto\Pagination\PaginateDto;
 
 class TokenRepository implements TokenRepositoryContract
 {
@@ -15,7 +14,7 @@ class TokenRepository implements TokenRepositoryContract
         // TODO: Implement get() method.
     }
     
-    public function paginate(int $perPage = self::PER_PAGE): PaginateDto
+    public function paginate(int $perPage = self::PER_PAGE): array
     {
         // TODO: Implement paginate() method.
     }

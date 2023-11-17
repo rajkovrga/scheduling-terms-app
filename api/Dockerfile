@@ -13,7 +13,11 @@ COPY . /var/www/html
 
 USER root
 
+RUN chmod +x run.sh
+
 ENV COMPOSER_ALLOW_SUPERUSER=1
+
+COPY ./docker/config/xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
 RUN apt update -y && apt upgrade -y \
     && install-php-extensions intl zip bcmath pgsql pdo_pgsql pcntl gmp opcache uuid amqp json_post igbinary ast redis apcu \
@@ -21,7 +25,10 @@ RUN apt update -y && apt upgrade -y \
     && php composer-setup.php --install-dir=/bin --filename=composer \
     && php -r "unlink('composer-setup.php');"
 
-COPY docker/config/www.conf /usr/local/etc/php-fpm.d/www.conf
+RUN pecl install xdebug \
+        && docker-php-ext-enable xdebug
+
+COPY docker/config/www.conf /usr/local/etc/php/conf.d/xdebug.ini
 
 EXPOSE 9000
 
@@ -35,6 +42,6 @@ RUN apt-get update \
     && apt-get install -y nodejs \
     && npm install -g npm \
     && apt-get -y autoremove \
-    && apt-get clean \
+    && apt-get clean
 
 ENV APP_ENVIRONMENT=development

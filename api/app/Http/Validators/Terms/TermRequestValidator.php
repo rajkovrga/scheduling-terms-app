@@ -13,10 +13,8 @@ class TermRequestValidator extends RequestValidator
     public function rules(): array
     {
         return [
-            'name' => 'required|min:4',
-            // TODO: FIX
-            'start_date' => 'required|date|date_format:' . DateTimeInterface::ATOM,
-            'end_date' => 'required|date|date_format:' . DateTimeInterface::ATOM,
+            'user_id' => 'required|numeric',
+            'start_date' => 'required|date:' . DateTimeInterface::ATOM,
             'job_id' => 'required|numeric'
         ];
     }

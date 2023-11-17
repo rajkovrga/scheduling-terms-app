@@ -6,6 +6,7 @@ use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
+use SchedulingTerms\App\Exceptions\ModelNotFoundException;
 use Slim\Handlers\ErrorHandler;
 use Slim\Interfaces\CallableResolverInterface;
 
@@ -26,13 +27,10 @@ class AppErrorHandler extends ErrorHandler
             return $code;
         }
 
-        foreach ($this->exceptions as $key => $value) {
-            if ($this->exception instanceof $key) {
-                return $this->exceptions[$key];
-            }
-        }
-
-        return $code;
+        return match ($this->exception::class) {
+            ModelNotFoundException::class => 404,
+            default => 500
+        };
     }
 
     protected function determineContentType(ServerRequestInterface $request): ?string
@@ -64,7 +62,7 @@ class AppErrorHandler extends ErrorHandler
     protected function respond(): ResponseInterface
     {
         $response = $this->responseFactory->createResponse($this->statusCode);
-
+        
         $renderer = $this->determineRenderer();
         $body = $renderer($this->exception, $this->displayErrorDetails);
         $response->getBody()->write($body);

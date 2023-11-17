@@ -10,7 +10,7 @@ use SchedulingTerms\App\Dto\Pagination\PaginateDto;
 class CachedRepository implements RepositoryContract
 {
     public function __construct(
-        private readonly RepositoryContract $repositoryContract,
+        private readonly RepositoryContract $repository,
         private readonly Redis $redis
     )
     {
@@ -22,11 +22,10 @@ class CachedRepository implements RepositoryContract
      */
     public function get(int $id)
     {
-        $data = $this->redis->get($id);
+        $data = $this->redis->get(' .' . $id);
         
         if(!$data) {
-            $data = $this->repositoryContract->get($id);
-            $this->redis->set($id, $data);
+            $data = $this->repository->get($id);
         }
         
         return $data;
@@ -36,8 +35,7 @@ class CachedRepository implements RepositoryContract
         return '';
     }
     
-    
-    public function paginate(int $perPage = self::PER_PAGE): PaginateDto
+    public function paginate(int $perPage = self::PER_PAGE): array
     {
         return $this->repositoryContract->paginate($perPage);
     }
@@ -47,7 +45,7 @@ class CachedRepository implements RepositoryContract
      */
     public function delete(int $id): void
     {
-        $this->redis->del($id);
         $this->repositoryContract->delete($id);
+        $this->redis->del($id);
     }
 }

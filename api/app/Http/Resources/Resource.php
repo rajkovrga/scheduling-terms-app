@@ -27,7 +27,7 @@ abstract class Resource
     
     public abstract function toArray(Request $request): array;
     
-    public static function toCollection(iterable $items): Generator
+    public function toCollection(iterable $items): Generator
     {
         foreach ($items as $item) {
             yield static::toArray($item);

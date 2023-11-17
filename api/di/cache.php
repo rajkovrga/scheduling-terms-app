@@ -5,12 +5,19 @@ use Carbon\CarbonInterval;
 
 return [
     'company' => [
-        'cache_prefix' => 'clients',
-        'cache_duration' => CarbonInterval::hours(2),
+        'cache_prefix' => 'companies',
+        'cache_duration' => CarbonInterval::hours(8),
     ],
-    'images' => [
-        'cache_prefix' => 'images',
-        'cache_duration' => CarbonInterval::hours(2),
+    'term' => [
+        'cache_prefix' => 'terms',
+        'cache_duration' => CarbonInterval::hours(8),
     ],
-
+    'job' => [
+        'cache_prefix' => 'jobs',
+        'cache_duration' => CarbonInterval::hours(8),
+    ],
+    'user' => [
+        'cache_prefix' => 'users',
+        'cache_duration' => CarbonInterval::hours(8),
+    ],
 ];

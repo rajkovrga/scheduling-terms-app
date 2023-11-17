@@ -9,7 +9,9 @@ class CreateUpdateUserDto extends BaseDto
 {
     public function __construct(
         public readonly string $email,
-        public readonly int $companyId
+        public readonly int $companyId,
+        public readonly ?string $password,
+        public readonly int $roleId
     )
     {
     }

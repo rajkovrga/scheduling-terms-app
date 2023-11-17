@@ -7,22 +7,14 @@ use SchedulingTerms\App\Dto\BaseDto;
 
 class CreateUpdateTermDto extends BaseDto
 {
-    private int $userId;
-    private ?CarbonImmutable $startDate;
-    private ?CarbonImmutable $endDate;
-    private int $jobId;
-    private int $companyId;
-    public static function from(array $data): CreateUpdateTermDto
+    public ?CarbonImmutable $startDate;
+    public function __construct(
+        public readonly int $userId,
+        public readonly int $jobId,
+        public readonly int $companyId,
+        string $startDate
+    )
     {
-        $current = new self($data);
-        
-        $current->companyId = $data['company_id'];
-        $current->jobId = $data['job_id'];
-        $current->userId = $data['user_id'];
-        $current->startDate = $current->parseDateTime($data['start_date']);
-        $current->endDate = $current->parseDateTime($data['end_date']);
-    
-        return $current;
+        $this->startDate = $this->parseDateTime($startDate);
     }
-    
 }
