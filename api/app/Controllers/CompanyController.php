@@ -26,8 +26,9 @@ class CompanyController
     
     #[GetRoute('/paginate/{cursor}')]
     public function getCompanies(ServerRequestInterface $request,ResponseInterface $response): ResponseInterface {
-
-        return $response;
+        $data = $this->companyRepository->paginate();
+        
+        return $response->withJson((new CompanyResource($data))->toCollection($data),200);
     }
 
     #[GetRoute('/{id}')]

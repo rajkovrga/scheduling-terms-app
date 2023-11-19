@@ -28,7 +28,9 @@ class TermController
     #[GetRoute('/paginate/{cursor}')]
     public function getTerms(Request $request, ResponseInterface $response, string $cursor)
     {
+        $data = $this->termRepository->paginate();
     
+        return $response->withJson((new TermResource($data))->toCollection($data),200);
     }
     
     #[GetRoute('/{id}')]

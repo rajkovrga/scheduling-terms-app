@@ -7,6 +7,7 @@ use Cake\Database\Connection;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Redis;
+use SchedulingTerms\App\Contracts\Repositories\TokenRepositoryContract;
 use SchedulingTerms\App\Contracts\Services\IEmailService;
 use SchedulingTerms\App\Core\Routing\Attributes\GetRoute;
 use SchedulingTerms\App\Core\Routing\Attributes\PostRoute;
@@ -15,16 +16,18 @@ use SchedulingTerms\App\Dto\Pagination\PaginateDto;
 use SchedulingTerms\App\Services\EmailService;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 
-class AuthController
+readonly class AuthController
 {
     public function __construct(
-        private readonly IEmailService $emailService
+        private IEmailService   $emailService,
+        private TokenRepositoryContract $tokenRepositoryContract
     ) {
     }
 
-    #[PostRoute('/login', ['auth'])]
+    #[PostRoute('/login')]
     public function login(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
+        
 
         return $response->withStatus('')->withJson([]);
     }
@@ -35,6 +38,7 @@ class AuthController
     #[GetRoute('/me')]
     public function me(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
+        
         return $response->withJson([], 201);
     }
 

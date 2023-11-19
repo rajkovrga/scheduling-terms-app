@@ -30,7 +30,7 @@ class Cache implements CacheInterface
             return $default;
         }
 
-        return $value;
+        return json_decode($value);
     }
 
     /**
@@ -100,7 +100,7 @@ class Cache implements CacheInterface
         foreach ($values as $key => $value) {
             $cacheKey = $this->getCacheKey($key);
 
-            if (!$this->set($cacheKey, $value, $ttl)) {
+            if (!$this->set($cacheKey, $value, $this->cacheDuration->totalSeconds)) {
                 $success = false;
             }
         }
@@ -138,7 +138,7 @@ class Cache implements CacheInterface
 
     private function getCacheKey(string $key): string
     {
-        return $this->cachePrefix . $key;
+        return $this->cachePrefix . '.' . $key;
     }
 
 }

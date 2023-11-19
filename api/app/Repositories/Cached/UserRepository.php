@@ -6,16 +6,15 @@ use RedisException;
 use SchedulingTerms\App\Contracts\Repositories\UserRepositoryContract;
 use SchedulingTerms\App\Dto\Users\CreateUpdateUserDto;
 use SchedulingTerms\App\Helpers\Cache;
+use SchedulingTerms\App\Models\Company;
 use SchedulingTerms\App\Models\User;
-use SchedulingTerms\App\Repositories\CachedRepository;
 
-class UserRepository extends CachedRepository implements UserRepositoryContract
+readonly class UserRepository implements UserRepositoryContract
 {
     public function __construct(
-        private readonly UserRepositoryContract $repository,
-        private readonly Cache                  $cache)
+        private UserRepositoryContract $repository,
+        private Cache                  $cache)
     {
-        parent::__construct($repository, $cache);
     }
 
     /**
@@ -40,8 +39,52 @@ class UserRepository extends CachedRepository implements UserRepositoryContract
     public function update(int $id, CreateUpdateUserDto $userDto): User
     {
         $user = $this->repository->update($id, $userDto);
-        $this->cache->set((string)$user->id, $user);
+        $this->cache->set((string)$user->id, json_encode($user));
 
         return $user;
+    }
+    
+    /**
+     * @throws RedisException
+     */
+    public function get(int $id): User
+    {
+    
+        $data = $this->cache->get((string)$id);
+    
+        if(!$data) {
+            $data = $this->repository->get($id);
+            $this->cache->set((string)$id, json_encode($data));
+        
+            return $data;
+        }
+    
+        return new User(
+            $data->id,
+            $data->email,
+            $data->password,
+            new Company(
+                $data->company->id,
+                $data->company->name,
+                $data->company->createdAt,
+                $data->company->updatedAt),
+            $data->roleId,
+            $data->createdAt,
+            $data->updatedAt
+        );
+    }
+    
+    public function paginate(int $perPage = self::PER_PAGE): array
+    {
+        return $this->repository->paginate($perPage);
+    }
+    
+    /**
+     * @throws RedisException
+     */
+    public function delete(int $id): void
+    {
+        $this->repository->delete($id);
+        $this->redis->delete((string)$id);
     }
 }

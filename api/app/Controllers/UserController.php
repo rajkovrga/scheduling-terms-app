@@ -25,7 +25,9 @@ readonly class UserController
     }
     #[GetRoute('/paginate/{cursor}')]
     public function getUsers(ServerRequestInterface $request,ResponseInterface $response, ?string $cursor = null) {
-        return $response->withJson([], 200);
+        $data = $this->userRepository->paginate();
+    
+        return $response->withJson((new UserResource($data))->toCollection($data),200);
     }
 
     #[GetRoute('/{id}')]

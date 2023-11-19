@@ -26,7 +26,9 @@ readonly class JobController
 
     #[GetRoute('/paginate/{cursor}',  ['auth'])]
     public function getJobs(ServerRequestInterface $request,ResponseInterface $response) {
-
+        $data = $this->jobRepository->paginate();
+    
+        return $response->withJson((new JobResource($data))->toCollection($data),200);
     }
 
     #[GetRoute('/{id}')]

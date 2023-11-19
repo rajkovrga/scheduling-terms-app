@@ -39,9 +39,16 @@ readonly class TokenRepository implements TokenRepositoryContract
 
         if($data === null) {
             $data = $this->repository->get($token);
+            $this->cache->set($data->token, json_encode($data));
+        
+            return $data;
         }
 
-        return $data;
+        return new Token(
+            $data->id,
+            $data->token,
+            $data->userId
+        );
     }
 
     public function paginate(int $perPage = self::PER_PAGE): array
