@@ -8,7 +8,7 @@ class AuthHelper
     {
     }
 
-    public static function isAuthorized(string $requiredPermission) {
+    public function isAuthorized(string $requiredPermission) {
         // Authorization logic
     }
 }
