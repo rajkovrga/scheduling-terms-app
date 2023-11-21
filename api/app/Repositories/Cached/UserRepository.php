@@ -85,6 +85,11 @@ readonly class UserRepository implements UserRepositoryContract
     public function delete(int $id): void
     {
         $this->repository->delete($id);
-        $this->redis->delete((string)$id);
+        $this->cache->delete((string)$id);
+    }
+
+    public function findByEmail(string $email): User
+    {
+        return $this->repository->findByEmail($email);
     }
 }

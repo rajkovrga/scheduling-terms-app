@@ -9,21 +9,14 @@ use SchedulingTerms\App\Contracts\Repositories\JobRepositoryContract;
 use SchedulingTerms\App\Contracts\Repositories\TermsRepositoryContract;
 use SchedulingTerms\App\Contracts\Repositories\TokenRepositoryContract;
 use SchedulingTerms\App\Contracts\Repositories\UserRepositoryContract;
+use SchedulingTerms\App\Controllers\AuthController;
 use SchedulingTerms\App\Controllers\CompanyController;
 use SchedulingTerms\App\Controllers\JobController;
 use SchedulingTerms\App\Controllers\TermController;
+use SchedulingTerms\App\Controllers\UserController;
 use SchedulingTerms\App\Helpers\Cache;
 use Cake\Datasource\ConnectionManager;
-use SchedulingTerms\App\Repositories\Cached\CompanyRepository as CacheCompanyRepository;
-use SchedulingTerms\App\Repositories\Cached\JobRepository as CacheJobRepository;
-use SchedulingTerms\App\Repositories\Cached\TermRepository as CacheTermRepository;
-use SchedulingTerms\App\Repositories\Cached\UserRepository as CacheUserRepository;
-use SchedulingTerms\App\Repositories\Cached\TokenRepository as CacheTokenRepository;
-use SchedulingTerms\App\Repositories\CompanyRepository;
-use SchedulingTerms\App\Repositories\JobRepository;
-use SchedulingTerms\App\Repositories\TermRepository;
-use SchedulingTerms\App\Repositories\TokenRepository;
-use SchedulingTerms\App\Repositories\UserRepository;
+use SchedulingTerms\App\Helpers\Hasher;
 use SchedulingTerms\App\Utils\Config;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\Transport;
@@ -50,60 +43,8 @@ return [
         $transport = Transport::fromDsn("gmail+smtp://{$config['username']}:{$config['password']}@default");
         return new Mailer($transport);
     },
-    CompanyRepositoryContract::class => static function (Container $container) {
-        return new CacheCompanyRepository(
-            new CompanyRepository(
-                $container->get(Connection::class)),
-            new Cache(
-                $container->get(Redis::class),
-                CarbonInterval::hours(8),
-                'companies'
-            )
-        );
-    },
-    UserRepositoryContract::class => static function (Container $container) {
-        return new CacheUserRepository(
-            new UserRepository(
-                $container->get(Connection::class)),
-            new Cache(
-                $container->get(Redis::class),
-                CarbonInterval::hours(8),
-                'users'
-            )
-        );
-    },
-    TermsRepositoryContract::class => static function (Container $container) {
-        return new CacheTermRepository(
-            new TermRepository(
-                $container->get(Connection::class)),
-            new Cache(
-                $container->get(Redis::class),
-                CarbonInterval::hours(8),
-                'terms'
-            )
-        );
-    },
-    TokenRepositoryContract::class => static function (Container $container) {
-        return new CacheTokenRepository(
-            new TokenRepository(
-                $container->get(Connection::class)),
-            new Cache(
-                $container->get(Redis::class),
-                CarbonInterval::days(14),
-                'tokens'
-            )
-        );
-    },
-    JobRepositoryContract::class => static function (Container $container) {
-        return new CacheJobRepository(
-            new JobRepository(
-                $container->get(Connection::class)),
-            new Cache(
-                $container->get(Redis::class),
-                CarbonInterval::hours(8),
-                'jobs'
-            )
-        );
+    Hasher::class => static function (Container $container) {
+        return new Hasher();
     },
     JobController::class => static function (Container $container) {
         return new JobController(
@@ -120,9 +61,17 @@ return [
             $container->get(TermsRepositoryContract::class)
         );
     },
-    UserRepository::class => static function (Container $container) {
-        return new UserRepository(
+    UserController::class => static function (Container $container) {
+        return new UserController(
             $container->get(UserRepositoryContract::class)
         );
-    }
+    },
+    AuthController::class => static function (Container $container) {
+        return new AuthController(
+            $container->get(Mailer::class),
+            $container->get(TokenRepositoryContract::class),
+            $container->get(UserRepositoryContract::class),
+            $container->get(Hasher::class)
+        );
+    },
 ];

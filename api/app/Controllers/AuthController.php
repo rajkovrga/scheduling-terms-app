@@ -9,21 +9,23 @@ use Psr\Http\Message\ServerRequestInterface;
 use Rakit\Validation\RuleQuashException;
 use Redis;
 use SchedulingTerms\App\Contracts\Repositories\TokenRepositoryContract;
+use SchedulingTerms\App\Contracts\Repositories\UserRepositoryContract;
 use SchedulingTerms\App\Contracts\Services\IEmailService;
 use SchedulingTerms\App\Core\Routing\Attributes\GetRoute;
 use SchedulingTerms\App\Core\Routing\Attributes\PostRoute;
 use SchedulingTerms\App\Core\Routing\Attributes\PutRoute;
-use SchedulingTerms\App\Dto\Pagination\PaginateDto;
+use SchedulingTerms\App\Helpers\Hasher;
 use SchedulingTerms\App\Http\Validators\Auth\LoginValidator;
-use SchedulingTerms\App\Http\Validators\Companies\CompanyRequestValidator;
-use SchedulingTerms\App\Services\EmailService;
+use SchedulingTerms\App\Http\Validators\AuthRequest;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 
 readonly class AuthController
 {
     public function __construct(
         private IEmailService   $emailService,
-        private TokenRepositoryContract $tokenRepositoryContract
+        private TokenRepositoryContract $tokenRepository,
+        private UserRepositoryContract $userRepository,
+        private Hasher $hasher
     ) {
     }
 
@@ -35,28 +37,34 @@ readonly class AuthController
     {
         $data = $request->getParsedBody();
 
-        $validator = new CompanyRequestValidator($request);
+        $validator = new LoginValidator($request);
         $result = $validator->validated($data);
 
         if($result->fails()) {
             return $response->withJson($result->errors()->toArray(), 409);
         }
 
-        
+        $user = $this->userRepository->findByEmail($data['email']);
 
-        $this->emailService->send();
+        if(!password_verify($data['password'], $user->password))
+        {
+            return $response->withStatus(403);
+        }
 
-        return $response->withStatus('')->withJson([]);
+        $token = $this->hasher->hashToken(str_shuffle($user->email));
+
+        return $response->withStatus('')->withJson([
+            'token' => $token
+        ]);
     }
     
     /**
      * @throws TransportExceptionInterface
      */
-    #[GetRoute('/me')]
-    public function me(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
+    #[GetRoute('/me', ['auth'])]
+    public function me(AuthRequest $request, ResponseInterface $response): ResponseInterface
     {
-        
-        return $response->withJson([], 201);
+        return $response->withJson($request->user(), 201);
     }
 
     #[PostRoute('/forget-password/{token}')]

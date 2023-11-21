@@ -103,6 +103,6 @@ readonly class TermRepository implements TermsRepositoryContract
     public function delete(int $id): void
     {
         $this->repository->delete($id);
-        $this->redis->delete((string)$id);
+        $this->cache->delete((string)$id);
     }
 }

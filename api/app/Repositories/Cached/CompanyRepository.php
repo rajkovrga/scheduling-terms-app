@@ -76,6 +76,6 @@ readonly class CompanyRepository implements CompanyRepositoryContract
     public function delete(int $id): void
     {
         $this->repository->delete($id);
-        $this->redis->delete((string)$id);
+        $this->cache->delete((string)$id);
     }
 }

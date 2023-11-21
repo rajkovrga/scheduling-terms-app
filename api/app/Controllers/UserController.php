@@ -2,8 +2,10 @@
 declare(strict_types=1);
 namespace SchedulingTerms\App\Controllers;
 
+use Exception;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Rakit\Validation\RuleQuashException;
 use SchedulingTerms\App\Contracts\Repositories\UserRepositoryContract;
 use SchedulingTerms\App\Core\Routing\Attributes\DeleteRoute;
 use SchedulingTerms\App\Core\Routing\Attributes\GetRoute;
@@ -11,6 +13,7 @@ use SchedulingTerms\App\Core\Routing\Attributes\GroupRoute;
 use SchedulingTerms\App\Core\Routing\Attributes\PostRoute;
 use SchedulingTerms\App\Core\Routing\Attributes\PutRoute;
 use SchedulingTerms\App\Dto\Users\CreateUpdateUserDto;
+use SchedulingTerms\App\Helpers\Hasher;
 use SchedulingTerms\App\Http\Resources\Users\UserResource;
 use SchedulingTerms\App\Http\Validators\Users\UserRequestValidator;
 use SchedulingTerms\App\Models\User;
@@ -19,7 +22,8 @@ use SchedulingTerms\App\Models\User;
 readonly class UserController
 {
     public function __construct(
-        public UserRepositoryContract $userRepository
+        private UserRepositoryContract $userRepository,
+        private Hasher $hasher
     )
     {
     }
@@ -39,6 +43,9 @@ readonly class UserController
         return $response->withJson((new UserResource($user))->toArray($request), 200);
     }
 
+    /**
+     * @throws Exception
+     */
     #[PostRoute('')]
     public function createUser(ServerRequestInterface $request,ResponseInterface $response) {
         // TODO: check permission
@@ -54,7 +61,7 @@ readonly class UserController
         $term = $this->userRepository->create(new CreateUpdateUserDto(
             $data['email'],
             $data['company_id'],
-            $data['password'],
+            $this->hasher->randomPassword(),
             $data['role_id'],
         ));
     

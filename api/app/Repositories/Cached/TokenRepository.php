@@ -3,12 +3,10 @@ declare(strict_types=1);
 namespace SchedulingTerms\App\Repositories\Cached;
 
 use RedisException;
-use SchedulingTerms\App\Contracts\Repositories\RepositoryContract;
 use SchedulingTerms\App\Contracts\Repositories\TokenRepositoryContract;
 use SchedulingTerms\App\Dto\Tokens\CreateTokenDto;
 use SchedulingTerms\App\Helpers\Cache;
 use SchedulingTerms\App\Models\Token;
-use SchedulingTerms\App\Repositories\CachedRepository;
 
 readonly class TokenRepository implements TokenRepositoryContract
 {

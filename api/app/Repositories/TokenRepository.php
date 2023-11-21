@@ -8,6 +8,7 @@ use Cake\Database\Exception\DatabaseException;
 use SchedulingTerms\App\Contracts\Repositories\TokenRepositoryContract;
 use SchedulingTerms\App\Dto\Tokens\CreateTokenDto;
 use SchedulingTerms\App\Exceptions\ModelNotFoundException;
+use SchedulingTerms\App\Exceptions\TokenAuthException;
 use SchedulingTerms\App\Models\Token;
 use SchedulingTerms\App\Models\User;
 
@@ -38,6 +39,7 @@ class TokenRepository implements TokenRepositoryContract
 
     /**
      * @throws ModelNotFoundException
+     * @throws TokenAuthException
      */
     public function get(string $token): Token
     {
@@ -59,7 +61,7 @@ class TokenRepository implements TokenRepositoryContract
             ->fetch('assoc');
 
         if (!$data) {
-            throw new ModelNotFoundException("Model not found");
+            throw new TokenAuthException("Model not found");
         }
 
         return new Token(

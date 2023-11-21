@@ -9,4 +9,5 @@ interface UserRepositoryContract extends RepositoryContract
 {
     public function create(CreateUpdateUserDto $userDto): User;
     public function update(int $id, CreateUpdateUserDto $userDto): User;
+    public function findByEmail(string $email): User;
 }

@@ -5,23 +5,23 @@ use Carbon\CarbonInterval;
 
 return [
     'company' => [
-        'cache_prefix' => 'companies',
-        'cache_duration' => CarbonInterval::hours(8),
+        'prefix' => 'companies',
+        'duration' => CarbonInterval::hours(8),
     ],
     'term' => [
-        'cache_prefix' => 'terms',
-        'cache_duration' => CarbonInterval::hours(8),
+        'prefix' => 'terms',
+        'duration' => CarbonInterval::hours(8),
     ],
     'job' => [
-        'cache_prefix' => 'jobs',
-        'cache_duration' => CarbonInterval::hours(8),
+        'prefix' => 'jobs',
+        'duration' => CarbonInterval::hours(8),
     ],
     'user' => [
-        'cache_prefix' => 'users',
-        'cache_duration' => CarbonInterval::hours(8),
+        'prefix' => 'users',
+        'duration' => CarbonInterval::hours(8),
     ],
     'token' => [
-        'cache_prefix' => 'tokens',
-        'cache_duration' => CarbonInterval::month(8),
+        'prefix' => 'tokens',
+        'duration' => CarbonInterval::month(8),
     ],
 ];
