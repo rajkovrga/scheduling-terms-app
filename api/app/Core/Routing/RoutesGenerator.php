@@ -126,7 +126,7 @@ readonly class RoutesGenerator
                 false => $middleware,
             };
 
-            yield "\n\t->add(new $md())";
+            yield "\n\t->add($md::class)";
         }
     }
     

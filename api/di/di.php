@@ -63,12 +63,12 @@ return [
     },
     UserController::class => static function (Container $container) {
         return new UserController(
-            $container->get(UserRepositoryContract::class)
+            $container->get(UserRepositoryContract::class),
+            $container->get(Hasher::class)
         );
     },
     AuthController::class => static function (Container $container) {
         return new AuthController(
-            $container->get(Mailer::class),
             $container->get(TokenRepositoryContract::class),
             $container->get(UserRepositoryContract::class),
             $container->get(Hasher::class)

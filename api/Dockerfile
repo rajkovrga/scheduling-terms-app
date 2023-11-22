@@ -11,9 +11,22 @@ COPY --from=composer /usr/bin/composer /usr/bin/composer
 
 COPY . /var/www/html
 
-USER root
+
+ARG UID=1000
+ARG GID=1000
+
+RUN groupadd -g $GID -o test
+RUN useradd -m -u $UID -g $GID -o -s /bin/bash test
+
+RUN chown -R test:test /var/www
+
+RUN usermod -u 1000 test
+RUN groupmod -g 1000 test
+
+COPY --chown=root:root . .
 
 RUN chmod +x run.sh
+RUN chmod 777 /var/www/html
 
 ENV COMPOSER_ALLOW_SUPERUSER=1
 

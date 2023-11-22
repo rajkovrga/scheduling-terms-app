@@ -38,7 +38,8 @@ class TokenRepository implements TokenRepositoryContract
     }
 
     /**
-     * @throws ModelNotFoundException
+     * @param string $token
+     * @return Token
      * @throws TokenAuthException
      */
     public function get(string $token): Token
@@ -80,8 +81,8 @@ class TokenRepository implements TokenRepositoryContract
 
     public function create(CreateTokenDto $tokenDto): Token
     {
-        $data = $this->connection->insertQuery('companies', [
-            'name' => $tokenDto->token,
+        $data = $this->connection->insertQuery('tokens', [
+            'token' => $tokenDto->token,
             'user_id' => $tokenDto->userId
         ])
             ->execute()
@@ -91,10 +92,6 @@ class TokenRepository implements TokenRepositoryContract
             throw new DatabaseException();
         }
 
-        return new Token(
-            $data['id'],
-            $data['name'],
-            $data['created_at']
-        );
+        return $this->get($data['token']);
     }
 }

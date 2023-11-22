@@ -16,7 +16,7 @@ use SchedulingTerms\App\Http\Validators\Companies\CompanyRequestValidator;
 use SchedulingTerms\App\Models\Company;
 
 #[GroupRoute('/companies')]
-class CompanyController
+readonly class CompanyController
 {
     public function __construct(
         public CompanyRepositoryContract $companyRepository

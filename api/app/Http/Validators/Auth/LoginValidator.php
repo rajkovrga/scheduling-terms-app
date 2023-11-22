@@ -11,7 +11,7 @@ class LoginValidator extends RequestValidator
     {
         return [
           'email' => 'required|email',
-          'password' => 'required|password'
+          'password' => 'required'
         ];
     }
 }

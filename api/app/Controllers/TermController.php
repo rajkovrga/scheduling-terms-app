@@ -18,7 +18,7 @@ use SchedulingTerms\App\Http\Validators\Terms\TermRequestValidator;
 use SchedulingTerms\App\Models\Term;
 
 #[GroupRoute('/terms')]
-class TermController
+readonly class TermController
 {
     public function __construct(
         public TermsRepositoryContract $termRepository
