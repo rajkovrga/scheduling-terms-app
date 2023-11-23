@@ -7,6 +7,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use SchedulingTerms\App\Exceptions\ModelNotFoundException;
+use SchedulingTerms\App\Exceptions\TokenAuthException;
 use Slim\Handlers\ErrorHandler;
 use Slim\Interfaces\CallableResolverInterface;
 
@@ -23,12 +24,9 @@ class AppErrorHandler extends ErrorHandler
     {
         $code = parent::determineStatusCode();
 
-        if ($code !== 500) {
-            return $code;
-        }
-
         return match ($this->exception::class) {
             ModelNotFoundException::class => 404,
+            TokenAuthException::class => 403,
             default => 500
         };
     }
@@ -43,7 +41,7 @@ class AppErrorHandler extends ErrorHandler
     }
     protected function logError(string $error): void
     {
-        if ($this->statusCode >= 500) {
+        if ($this->statusCode <= 500) {
             $this->logger->warning(
                 $this->exception->getMessage(),
                 [

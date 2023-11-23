@@ -56,6 +56,8 @@ services:
         image: dpage/pgadmin4:latest
         restart: unless-stopped
         container_name: pgadmin-data
+        volumes:
+            - pgadmin-data:/var/lib/pgadmin
         networks:
             - net
         depends_on:

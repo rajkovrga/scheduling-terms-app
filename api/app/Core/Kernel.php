@@ -5,9 +5,14 @@ declare(strict_types=1);
 namespace SchedulingTerms\App\Core;
 
 use Monolog\Logger;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
+use ReflectionException;
 use SchedulingTerms\App\Core\Routing\RoutesGenerator;
+use SchedulingTerms\App\Http\AppServerRequestFactory;
+use SchedulingTerms\App\Http\CustomServerRequestFactory;
 use SchedulingTerms\App\Utils\Config;
 use Slim\App;
 
@@ -51,7 +56,12 @@ abstract class Kernel
             }
         }
     }
-    
+
+    /**
+     * @throws NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     * @throws ReflectionException
+     */
     public function run(): void
     {
         $this->setup($this->container->get(Logger::class));
@@ -67,7 +77,9 @@ abstract class Kernel
         );
         
         $routerGenerator->generate();
-        
-        $this->app->run();
+
+        $request = CustomServerRequestFactory::createFromGlobals();
+
+        $this->app->run($request);
     }
 }

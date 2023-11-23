@@ -7,6 +7,7 @@ use SchedulingTerms\App\Contracts\Repositories\TokenRepositoryContract;
 use SchedulingTerms\App\Dto\Tokens\CreateTokenDto;
 use SchedulingTerms\App\Helpers\Cache;
 use SchedulingTerms\App\Models\Token;
+use SchedulingTerms\App\Models\User;
 
 readonly class TokenRepository implements TokenRepositoryContract
 {
@@ -44,8 +45,16 @@ readonly class TokenRepository implements TokenRepositoryContract
 
         return new Token(
             $data->id,
-            $data->token,
-            $data->userId
+            new User(
+                $data->user->id,
+                $data->user->email,
+                $data->user->password,
+                null,
+                $data->user->roleId,
+                $data->user->createdAt,
+                $data->user->updatedAt
+            ),
+            $data->token
         );
     }
 
@@ -61,5 +70,10 @@ readonly class TokenRepository implements TokenRepositoryContract
     {
         $this->repository->delete($token);
         $this->cache->delete($token);
+    }
+
+    public function getByUserId(int $userId): Token
+    {
+        return $this->repository->getByUserId($userId);
     }
 }

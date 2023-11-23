@@ -1,17 +1,16 @@
 <?php
 
-namespace SchedulingTerms\App\Http\Validators;
+namespace SchedulingTerms\App\Http;
 
 use Psr\Http\Message\ServerRequestInterface;
-use SchedulingTerms\App\Models\User;
 use SchedulingTerms\App\Utils\CurrentUser;
-use Slim\Http\ServerRequest;
+use Slim\Psr7\Request;
 
-class AuthRequest extends ServerRequest implements ServerRequestInterface
-{
+class AppRequest extends Request implements ServerRequestInterface {
+
     public function user(): ?CurrentUser
     {
-        $user = $this->serverRequest->getAttribute('user');
+        $user = $this->getAttribute('user');
 
         if($user) {
             return $user instanceof CurrentUser ? $user : null;
@@ -19,6 +18,5 @@ class AuthRequest extends ServerRequest implements ServerRequestInterface
 
         return null;
     }
-
 
 }

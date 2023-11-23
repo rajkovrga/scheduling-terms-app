@@ -24,4 +24,8 @@ return [
         'prefix' => 'tokens',
         'duration' => CarbonInterval::month(8),
     ],
+    'permission' => [
+        'prefix' => 'permissions',
+        'duration' => CarbonInterval::month(8),
+    ],
 ];

@@ -81,6 +81,7 @@ class TokenRepository implements TokenRepositoryContract
 
     public function create(CreateTokenDto $tokenDto): Token
     {
+
         $data = $this->connection->insertQuery('tokens', [
             'token' => $tokenDto->token,
             'user_id' => $tokenDto->userId
@@ -93,5 +94,42 @@ class TokenRepository implements TokenRepositoryContract
         }
 
         return $this->get($data['token']);
+    }
+
+    public function getByUserId(int $userId): Token
+    {
+        $data = $this->connection
+            ->selectQuery([
+                'tokens.id as id',
+                'users.id as userId',
+                'users.email as email',
+                'users.password as password',
+                'users.role_id as roleId',
+                'users.created_at as userCreatedAt',
+                'users.updated_at as userUpdatedAt',
+                'tokens.token as token'
+            ],
+                'tokens')
+            ->innerJoin('users', ['users.id = tokens.user_id'])
+            ->where(['tokens.user_id' => $userId])
+            ->execute()
+            ->fetch('assoc');
+
+        if (!$data) {
+            throw new TokenAuthException("Model not found");
+        }
+
+        return new Token(
+            $data['id'],
+            new User(
+                $data['userId'],
+                $data['email'],
+                $data['password'],
+                null,
+                $data['roleId'],
+                $data['userCreatedAt'],
+                $data['userUpdatedAt']),
+            $data['token'],
+        );
     }
 }

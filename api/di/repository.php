@@ -1,11 +1,14 @@
 <?php
 declare(strict_types=1);
 
+use SchedulingTerms\App\Contracts\Repositories\AuthRepositoryContract;
+use SchedulingTerms\App\Repositories\AuthRepository;
 use SchedulingTerms\App\Repositories\Cached\CompanyRepository as CacheCompanyRepository;
 use SchedulingTerms\App\Repositories\Cached\JobRepository as CacheJobRepository;
 use SchedulingTerms\App\Repositories\Cached\TermRepository as CacheTermRepository;
 use SchedulingTerms\App\Repositories\Cached\UserRepository as CacheUserRepository;
 use SchedulingTerms\App\Repositories\Cached\TokenRepository as CacheTokenRepository;
+use SchedulingTerms\App\Repositories\Cached\AuthRepository as CacheAuthRepository;
 use SchedulingTerms\App\Repositories\CompanyRepository;
 use SchedulingTerms\App\Repositories\JobRepository;
 use SchedulingTerms\App\Repositories\TermRepository;
@@ -21,7 +24,6 @@ use SchedulingTerms\App\Contracts\Repositories\UserRepositoryContract;
 use SchedulingTerms\App\Helpers\Cache;
 
 return [
-
     CompanyRepositoryContract::class => static function (Container $container) {
         return new CacheCompanyRepository(
             new CompanyRepository(
@@ -74,6 +76,17 @@ return [
                 $container->get(Redis::class),
                 $container->get('job')['duration'],
                 $container->get('job')['prefix']
+            )
+        );
+    },
+    AuthRepositoryContract::class => static function (Container $container) {
+        return new CacheAuthRepository(
+            new AuthRepository(
+                $container->get(Connection::class)),
+            new Cache(
+                $container->get(Redis::class),
+                $container->get('permission')['duration'],
+                $container->get('permission')['prefix']
             )
         );
     },

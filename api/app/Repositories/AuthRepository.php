@@ -18,9 +18,9 @@ readonly class AuthRepository implements AuthRepositoryContract
         return $this->connection->selectQuery([
             'permissions.name'
         ],'permissions')
-            ->innerJoin('role_permissions', ['permissions.id = role_permissions.permission_id'])
-            ->where('role_id', $roleId)
+            ->innerJoin('role_permission', ['permissions.id = role_permission.permission_id'])
+            ->where(['role_id' => $roleId])
             ->execute()
-            ->fetchAll('array');
+            ->fetchAll();
     }
 }
