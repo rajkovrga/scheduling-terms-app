@@ -87,6 +87,11 @@ return [
                 $container->get(Redis::class),
                 $container->get('permission')['duration'],
                 $container->get('permission')['prefix']
+            ),
+            new Cache(
+                $container->get(Redis::class),
+                $container->get('recovery')['duration'],
+                $container->get('recovery')['prefix']
             )
         );
     },

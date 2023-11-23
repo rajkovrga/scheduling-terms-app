@@ -15,8 +15,8 @@ class Hasher
         return password_hash($value, PASSWORD_ARGON2I, $options);
     }
 
-    public function hashToken(string $value): string {
-        return hash('sha512/256', $value);
+    public function hashToken(): string {
+        return hash('sha512/256', base64_decode(random_bytes(8)));
     }
 
     /**

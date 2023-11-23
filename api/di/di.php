@@ -2,7 +2,6 @@
 declare(strict_types=1);
 
 use Cake\Database\Connection;
-use Carbon\CarbonInterval;
 use Psr\Container\ContainerInterface as Container;
 use SchedulingTerms\App\Contracts\Repositories\AuthRepositoryContract;
 use SchedulingTerms\App\Contracts\Repositories\CompanyRepositoryContract;
@@ -10,14 +9,15 @@ use SchedulingTerms\App\Contracts\Repositories\JobRepositoryContract;
 use SchedulingTerms\App\Contracts\Repositories\TermsRepositoryContract;
 use SchedulingTerms\App\Contracts\Repositories\TokenRepositoryContract;
 use SchedulingTerms\App\Contracts\Repositories\UserRepositoryContract;
+use SchedulingTerms\App\Contracts\Services\IEmailService;
 use SchedulingTerms\App\Controllers\AuthController;
 use SchedulingTerms\App\Controllers\CompanyController;
 use SchedulingTerms\App\Controllers\JobController;
 use SchedulingTerms\App\Controllers\TermController;
 use SchedulingTerms\App\Controllers\UserController;
-use SchedulingTerms\App\Helpers\Cache;
 use Cake\Datasource\ConnectionManager;
 use SchedulingTerms\App\Helpers\Hasher;
+use SchedulingTerms\App\Services\EmailService;
 use SchedulingTerms\App\Utils\Config;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\Transport;
@@ -39,10 +39,10 @@ return [
         }
         return $redis;
     },
-    Mailer::class => static function (Container $container) {
+    IEmailService::class => static function (Container $container) {
         $config = $container->get(Config::class)->get('mail.smtp');
         $transport = Transport::fromDsn("gmail+smtp://{$config['username']}:{$config['password']}@default");
-        return new Mailer($transport);
+        return new EmailService(new Mailer($transport), $container->get(Config::class));
     },
     Hasher::class => static function (Container $container) {
         return new Hasher();
@@ -70,6 +70,7 @@ return [
     },
     AuthController::class => static function (Container $container) {
         return new AuthController(
+            $container->get(IEmailService::class),
             $container->get(TokenRepositoryContract::class),
             $container->get(UserRepositoryContract::class),
             $container->get(Hasher::class),

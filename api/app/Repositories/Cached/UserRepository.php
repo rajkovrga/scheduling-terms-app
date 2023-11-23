@@ -88,6 +88,6 @@ readonly class UserRepository implements UserRepositoryContract
 
     public function getByEmail(string $email): User
     {
-        return $this->repository->findByEmail($email);
+        return $this->repository->getByEmail($email);
     }
 }

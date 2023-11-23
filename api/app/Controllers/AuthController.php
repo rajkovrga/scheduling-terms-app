@@ -9,6 +9,7 @@ use Rakit\Validation\RuleQuashException;
 use SchedulingTerms\App\Contracts\Repositories\AuthRepositoryContract;
 use SchedulingTerms\App\Contracts\Repositories\TokenRepositoryContract;
 use SchedulingTerms\App\Contracts\Repositories\UserRepositoryContract;
+use SchedulingTerms\App\Contracts\Services\IEmailService;
 use SchedulingTerms\App\Core\Routing\Attributes\GetRoute;
 use SchedulingTerms\App\Core\Routing\Attributes\PostRoute;
 use SchedulingTerms\App\Core\Routing\Attributes\PutRoute;
@@ -19,13 +20,12 @@ use SchedulingTerms\App\Http\Resources\Users\UserResource;
 use SchedulingTerms\App\Http\Validators\Auth\ChangePasswordValidator;
 use SchedulingTerms\App\Http\Validators\Auth\ForgotPasswordValidator;
 use SchedulingTerms\App\Http\Validators\Auth\LoginValidator;
-use Slim\Psr7\Request;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 
 readonly class AuthController
 {
     public function __construct(
-//        private IEmailService           $emailService,
+        private IEmailService           $emailService,
         private TokenRepositoryContract $tokenRepository,
         private UserRepositoryContract  $userRepository,
         private Hasher                  $hasher,
@@ -49,7 +49,7 @@ readonly class AuthController
             return $response->withJson($result->errors()->toArray(), 409);
         }
 
-        $user = $this->userRepository->findByEmail($data['email']);
+        $user = $this->userRepository->getByEmail($data['email']);
 
         if (!password_verify($data['password'], $user->password)) {
             return $response->withStatus(403);
@@ -88,7 +88,7 @@ readonly class AuthController
     }
 
     #[PostRoute('/forget-password')]
-    public function forgetPassword(ServerRequestInterface $request, ResponseInterface $response, string $token): ResponseInterface
+    public function forgetPassword(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
         $data = $request->getParsedBody();
     
@@ -101,13 +101,19 @@ readonly class AuthController
         
         $user = $this->userRepository->getByEmail($data['email']);
         
-        $this->emailService->send($user->email, 'Recovery Password', '<h1>test</h1>');
+        $token = $this->hasher->hashToken();
+        
+        $this->authRepositoryContract->saveRecoveryToken($token,$user->id);
+        $this->emailService->sendPasswordRecovery($user->email, 'Recovery Password', $request, $token);
         
         return $response->withStatus(201);
     }
-
+    
+    /**
+     * @throws RuleQuashException
+     */
     #[PutRoute('/change-password/{token}')]
-    public function changePassword(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
+    public function changePassword(ServerRequestInterface $request, ResponseInterface $response, string $token): ResponseInterface
     {
         $data = $request->getParsedBody();
     
@@ -118,9 +124,26 @@ readonly class AuthController
             return $response->withJson($result->errors()->toArray(), 409);
         }
         
+        $checkResult = $this->authRepositoryContract->checkRecoveryToken($token);
+    
+        if(!$checkResult) {
+            return $response->withJson("Token expired", 401);
+        }
         
-
+        $user = $this->userRepository->get($checkResult);
+        
+        $hashPassword = $this->hasher->hashPassword($data['password']);
+        
+        $this->authRepositoryContract->changePassword($user->id, $hashPassword);
+        
         return $response->withStatus(204);
+    }
+    
+    #[PostRoute('/logout', ['auth'])]
+    public function logout(AppRequest $request, ResponseInterface $response): ResponseInterface
+    {
+        $this->tokenRepository->delete($request->token);
+        return $response->withJson("Successfully logout", 204);
     }
 
 }

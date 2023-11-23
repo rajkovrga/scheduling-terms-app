@@ -11,6 +11,7 @@ use Slim\Psr7\Request;
 class AppRequest extends ServerRequest implements ServerRequestInterface {
 
     public ?User $currentUser = null;
+    public string $token;
     public function user(): ?User
     {
         return $this->currentUser;

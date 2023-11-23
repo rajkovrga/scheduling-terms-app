@@ -12,7 +12,7 @@ class PasswordRule extends Rule
     {
         $minLength = 8;
 
-        if (strlen($value) <= $minLength) {
+        if (strlen($value) < $minLength) {
             return false;
         }
 

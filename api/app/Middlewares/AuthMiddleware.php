@@ -35,13 +35,14 @@ readonly class AuthMiddleware
             throw new AuthException('User is not authorized');
         }
 
-        $token = $this->tokenRepository->get($token);
+        $data = $this->tokenRepository->get($token);
 
         /** @var User $user */
-        $user = $this->userRepository->get($token->id);
+        $user = $this->userRepository->get($data->id);
         $req = new AppRequest($request);
     
         $req->currentUser = $user;
+        $req->token = $token;
     
         return $handler->handle($req);
     }

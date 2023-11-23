@@ -34,7 +34,7 @@ class TokenRepository implements TokenRepositoryContract
             throw new ModelNotFoundException();
         }
 
-        $this->connection->delete('terms', ['token' => $token]);
+        $this->connection->delete('tokens', ['token' => $token]);
     }
 
     /**

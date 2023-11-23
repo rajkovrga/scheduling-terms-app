@@ -28,4 +28,8 @@ return [
         'prefix' => 'permissions',
         'duration' => CarbonInterval::month(8),
     ],
+    'recovery' => [
+        'prefix' => 'recovery',
+        'duration' => CarbonInterval::minutes(45),
+    ],
 ];
