@@ -55,8 +55,6 @@ readonly class UserRepository implements UserRepositoryContract
         if(!$data) {
             $data = $this->repository->get($id);
             $this->cache->set((string)$id, json_encode($data));
-        
-            return $data;
         }
     
         return new User(
@@ -88,7 +86,7 @@ readonly class UserRepository implements UserRepositoryContract
         $this->cache->delete((string)$id);
     }
 
-    public function findByEmail(string $email): User
+    public function getByEmail(string $email): User
     {
         return $this->repository->findByEmail($email);
     }

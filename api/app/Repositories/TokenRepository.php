@@ -96,7 +96,7 @@ class TokenRepository implements TokenRepositoryContract
         return $this->get($data['token']);
     }
 
-    public function getByUserId(int $userId): Token
+    public function getByUserId(int $userId): ?Token
     {
         $data = $this->connection
             ->selectQuery([
@@ -116,7 +116,7 @@ class TokenRepository implements TokenRepositoryContract
             ->fetch('assoc');
 
         if (!$data) {
-            throw new TokenAuthException("Model not found");
+            return null;
         }
 
         return new Token(

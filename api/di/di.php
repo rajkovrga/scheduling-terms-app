@@ -4,6 +4,7 @@ declare(strict_types=1);
 use Cake\Database\Connection;
 use Carbon\CarbonInterval;
 use Psr\Container\ContainerInterface as Container;
+use SchedulingTerms\App\Contracts\Repositories\AuthRepositoryContract;
 use SchedulingTerms\App\Contracts\Repositories\CompanyRepositoryContract;
 use SchedulingTerms\App\Contracts\Repositories\JobRepositoryContract;
 use SchedulingTerms\App\Contracts\Repositories\TermsRepositoryContract;
@@ -71,7 +72,8 @@ return [
         return new AuthController(
             $container->get(TokenRepositoryContract::class),
             $container->get(UserRepositoryContract::class),
-            $container->get(Hasher::class)
+            $container->get(Hasher::class),
+            $container->get(AuthRepositoryContract::class)
         );
     },
 ];

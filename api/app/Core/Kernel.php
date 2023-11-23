@@ -77,9 +77,7 @@ abstract class Kernel
         );
         
         $routerGenerator->generate();
-
-        $request = CustomServerRequestFactory::createFromGlobals();
-
-        $this->app->run($request);
+        
+        $this->app->run();
     }
 }

@@ -128,7 +128,7 @@ readonly class UserRepository implements UserRepositoryContract
     /**
      * @throws ModelNotFoundException
      */
-    public function findByEmail(string $email): User
+    public function getByEmail(string $email): User
     {
         $user = $this->connection->selectQuery(['*'], 'users')
             ->where(['email' => $email])

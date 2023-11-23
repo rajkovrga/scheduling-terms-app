@@ -15,7 +15,7 @@ use SchedulingTerms\App\Http\Resources\Companies\CompanyResource;
 use SchedulingTerms\App\Http\Validators\Companies\CompanyRequestValidator;
 use SchedulingTerms\App\Models\Company;
 
-#[GroupRoute('/companies')]
+#[GroupRoute('/companies', ['auth'])]
 readonly class CompanyController
 {
     public function __construct(

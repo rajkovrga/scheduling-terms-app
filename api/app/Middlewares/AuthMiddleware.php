@@ -11,13 +11,15 @@ use SchedulingTerms\App\Exceptions\AuthException;
 use SchedulingTerms\App\Http\AppRequest;
 use SchedulingTerms\App\Models\User;
 use SchedulingTerms\App\Utils\CurrentUser;
+use Slim\Http\ServerRequest;
+use Slim\Psr7\Request;
+use Slim\Psr7\Response;
 
 readonly class AuthMiddleware
 {
     public function __construct(
         private TokenRepositoryContract $tokenRepository,
-        private UserRepositoryContract  $userRepository,
-        private AuthRepositoryContract  $authRepository
+        private UserRepositoryContract  $userRepository
     )
     {
     }
@@ -25,7 +27,7 @@ readonly class AuthMiddleware
     /**
      * @throws AuthException
      */
-    public function __invoke(AppRequest $request, RequestHandler $handler): ResponseInterface
+    public function __invoke(ServerRequest $request, RequestHandler $handler): ResponseInterface
     {
         $token = $request->getHeaderLine('Authorization');
 
@@ -37,14 +39,10 @@ readonly class AuthMiddleware
 
         /** @var User $user */
         $user = $this->userRepository->get($token->id);
-
-        $permissions = $this->authRepository->getPermissions($user->roleId);
-
-        $request->withAttribute('user', new CurrentUser(
-            $user,
-            $permissions
-        ));
-
-        return $handler->handle($request);
+        $req = new AppRequest($request);
+    
+        $req->currentUser = $user;
+    
+        return $handler->handle($req);
     }
 }

@@ -3,20 +3,17 @@
 namespace SchedulingTerms\App\Http;
 
 use Psr\Http\Message\ServerRequestInterface;
+use SchedulingTerms\App\Models\User;
 use SchedulingTerms\App\Utils\CurrentUser;
+use Slim\Http\ServerRequest;
 use Slim\Psr7\Request;
 
-class AppRequest extends Request implements ServerRequestInterface {
+class AppRequest extends ServerRequest implements ServerRequestInterface {
 
-    public function user(): ?CurrentUser
+    public ?User $currentUser = null;
+    public function user(): ?User
     {
-        $user = $this->getAttribute('user');
-
-        if($user) {
-            return $user instanceof CurrentUser ? $user : null;
-        }
-
-        return null;
+        return $this->currentUser;
     }
 
 }

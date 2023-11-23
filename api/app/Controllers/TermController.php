@@ -17,7 +17,7 @@ use SchedulingTerms\App\Http\Resources\Terms\TermResource;
 use SchedulingTerms\App\Http\Validators\Terms\TermRequestValidator;
 use SchedulingTerms\App\Models\Term;
 
-#[GroupRoute('/terms')]
+#[GroupRoute('/terms', ['auth'])]
 readonly class TermController
 {
     public function __construct(

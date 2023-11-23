@@ -18,7 +18,7 @@ use SchedulingTerms\App\Http\Resources\Users\UserResource;
 use SchedulingTerms\App\Http\Validators\Users\UserRequestValidator;
 use SchedulingTerms\App\Models\User;
 
-#[GroupRoute('/users')]
+#[GroupRoute('/users', ['auth'])]
 readonly class UserController
 {
     public function __construct(

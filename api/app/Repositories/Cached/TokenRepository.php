@@ -72,7 +72,7 @@ readonly class TokenRepository implements TokenRepositoryContract
         $this->cache->delete($token);
     }
 
-    public function getByUserId(int $userId): Token
+    public function getByUserId(int $userId): ?Token
     {
         return $this->repository->getByUserId($userId);
     }
