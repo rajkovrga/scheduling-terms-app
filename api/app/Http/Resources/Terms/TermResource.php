@@ -10,25 +10,26 @@ use SchedulingTerms\App\Http\Resources\Resource;
 use SchedulingTerms\App\Http\Resources\Users\UserResource;
 use SchedulingTerms\App\Models\Term;
 
-/**
- * @template-extends Term
- */
 class TermResource extends Resource
 {
     
-    public function toArray(ServerRequestInterface $request): array
+    /**
+     * @param Term $item
+     * @return array
+     */
+    public function toArray($item): array
     {
-        $user = new UserResource($this->item->user);
-        $job = new JobResource($this->item->job);
-        $company = new CompanyResource($this->item->company);
+        $user = new UserResource($this->request);
+        $job = new JobResource($this->request);
+        $company = new CompanyResource($this->request);
         
         return [
-            'id' => $this->item->id,
-            'start_date' => $this->item->startDate,
-            'end_date' => $this->item->endDate,
-            'user' => $user->toArray($request),
-            'job' => $job->toArray($request),
-            'company' => $company->toArray($request)
+            'id' => $item->id,
+            'start_date' => $item->startDate,
+            'end_date' => $item->endDate,
+            'user' => $user->toArray($item->user),
+            'job' => $job->toArray($item->job),
+            'company' => $company->toArray($item->company)
         ];
     }
 }

@@ -16,4 +16,5 @@ interface TermsRepositoryContract extends RepositoryContract
      * @return array<T>
      */
     public function calculateTerms(): array;
+    public function paginateByCompanyId(int $cursor, int $companyId, int $perPage = self::PER_PAGE): array;
 }

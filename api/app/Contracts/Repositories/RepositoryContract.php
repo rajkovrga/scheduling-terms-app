@@ -14,9 +14,10 @@ interface RepositoryContract
     public function get(int $id);
     
     /**
+     * @param int $cursor
      * @param int $perPage
      * @return array<T>
      */
-    public function paginate(int $perPage = self::PER_PAGE): array;
+    public function paginate(int $cursor, int $perPage = self::PER_PAGE): array;
     public function delete(int $id): void;
 }

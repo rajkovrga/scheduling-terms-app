@@ -5,7 +5,7 @@ namespace SchedulingTerms\App\Controllers;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Message\ServerRequestInterface as Request;
+use Rakit\Validation\RuleQuashException;
 use SchedulingTerms\App\Contracts\Repositories\TermsRepositoryContract;
 use SchedulingTerms\App\Core\Routing\Attributes\DeleteRoute;
 use SchedulingTerms\App\Core\Routing\Attributes\GetRoute;
@@ -13,9 +13,13 @@ use SchedulingTerms\App\Core\Routing\Attributes\GroupRoute;
 use SchedulingTerms\App\Core\Routing\Attributes\PostRoute;
 use SchedulingTerms\App\Core\Routing\Attributes\PutRoute;
 use SchedulingTerms\App\Dto\Terms\CreateUpdateTermDto;
+use SchedulingTerms\App\Exceptions\PermissionDeniedException;
+use SchedulingTerms\App\Http\AppRequest;
+use SchedulingTerms\App\Http\Resources\Pagination\PaginationResource;
 use SchedulingTerms\App\Http\Resources\Terms\TermResource;
 use SchedulingTerms\App\Http\Validators\Terms\TermRequestValidator;
 use SchedulingTerms\App\Models\Term;
+use SchedulingTerms\App\Utils\Permissions;
 
 #[GroupRoute('/terms', ['auth'])]
 readonly class TermController
@@ -25,35 +29,50 @@ readonly class TermController
     )
     {
     }
-    #[GetRoute('/paginate/{cursor}')]
-    public function getTerms(Request $request, ResponseInterface $response, string $cursor)
+    #[GetRoute('/paginate/{cursor:0}',  ['auth'])]
+    public function getTerms(AppRequest $request, ResponseInterface $response, int $cursor = 0)
     {
-        $data = $this->termRepository->paginate();
+        if($request->can(Permissions::ViewTerms)) {
+            $data = $this->termRepository->paginate($cursor);
+        }
     
-        return $response->withJson((new TermResource($data))->toCollection($data),200);
+        if($request->can(Permissions::ViewSelfTerms)) {
+            $data = $this->termRepository->paginateByCompanyId($cursor);
+        }
+    
+        return $response->withJson((new PaginationResource($request))->toArray((new TermResource($request))->toCollection($data)),200);
     }
     
+    /**
+     * @throws PermissionDeniedException
+     */
     #[GetRoute('/{id}')]
-    public function getTerm(Request $request, ResponseInterface $response, int $id)
+    public function getTerm(AppRequest $request, ResponseInterface $response, int $id)
     {
-        // TODO: check permission
-        /** @var Term $term */
+        if(!$request->can(Permissions::ViewTerms) || $id !== $request->user()->company->id) {
+            throw new PermissionDeniedException();
+        }
         $term = $this->termRepository->get($id);
     
-        return $response->withJson((new TermResource($term))->toArray($request), 200);
+        return $response->withJson((new TermResource($request))->toArray($term), 200);
     }
     
+    /**
+     * @throws RuleQuashException
+     * @throws PermissionDeniedException
+     */
     #[PostRoute('')]
-    public function createTerm(ServerRequestInterface $request, ResponseInterface $response)
+    public function createTerm(AppRequest $request, ResponseInterface $response)
     {
-        // TODO: check permission
+        $request->checkPermission(Permissions::CreateTerm, $response);
+        
         $data = $request->getParsedBody();
     
         $validator = new TermRequestValidator($request);
         $result = $validator->validated($data);
     
         if($result->fails()) {
-            return $response->withJson($result->errors()->toArray()->toArray(), 409);
+            return $response->withJson($result->errors()->toArray(), 409);
         }
     
         $term = $this->termRepository->create(new CreateUpdateTermDto(
@@ -63,20 +82,31 @@ readonly class TermController
             $data['start_date']
         ));
     
-        return $response->withJson((new TermResource($term))->toArray($request), 201);
+        return $response->withJson((new TermResource($request))->toArray($term), 201);
     }
     
+    /**
+     * @throws PermissionDeniedException
+     */
     #[DeleteRoute('/{id}')]
-    public function deleteTerm(Request $request, ResponseInterface $response, int $id)
+    public function deleteTerm(AppRequest $request, ResponseInterface $response, int $id): ResponseInterface
     {
+        $request->checkPermission(Permissions::DeleteTerm, $response);
+    
         $this->termRepository->delete($id);
     
         return $response->withStatus(204);
     }
     
+    /**
+     * @throws RuleQuashException
+     * @throws PermissionDeniedException
+     */
     #[PutRoute('/{id}')]
-    public function editTerm(Request $request, ResponseInterface $response, int $id)
+    public function editTerm(AppRequest $request, ResponseInterface $response, int $id)
     {
+        $request->checkPermission(Permissions::EditTerm, $response);
+    
         $data = $request->getParsedBody();
     
         $validator = new TermRequestValidator($request);
@@ -93,6 +123,6 @@ readonly class TermController
             $data['start_date']
         ));
     
-        return $response->withJson((new TermResource($term))->toArray($request), 200);
+        return $response->withJson((new TermResource($request))->toArray($term), 200);
     }
 }

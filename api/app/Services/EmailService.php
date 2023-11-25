@@ -40,14 +40,32 @@ readonly class EmailService implements IEmailService
     public function sendPasswordRecovery(string $emailAddress, string $subject, ServerRequestInterface $request, string $token): void
     {
         $htmlTemplate = file_get_contents(implode(DIRECTORY_SEPARATOR, [APP_BASE_PATH, 'resources', 'templates', 'recovery-password.html']));
-        $uri = $request->getUri();
     
         $htmlTemplate = str_replace('{email}', $emailAddress, $htmlTemplate);
     
-        $url = $uri->getScheme() . '://' . $uri->getHost() . '/change-password/' . $token;
+        $url = $this->getUrl($request, '/change-password/' . $token);
     
         $htmlTemplate = str_replace('{url}', $url , $htmlTemplate);
         
         $this->send($emailAddress, $subject, $htmlTemplate);
+    }
+    
+    /**
+     * @throws TransportExceptionInterface
+     */
+    public function sendNewCreatedUser(string $emailAddress, string $password, ServerRequestInterface $request): void
+    {
+        $htmlTemplate = file_get_contents(implode(DIRECTORY_SEPARATOR, [APP_BASE_PATH, 'resources', 'templates', 'new-user.html']));
+    
+        $htmlTemplate = str_replace('{email}', $emailAddress, $htmlTemplate);
+        $htmlTemplate = str_replace('{password}', $password, $htmlTemplate);
+        
+        $this->send($emailAddress, "New User", $htmlTemplate);
+    }
+    
+    private function getUrl(ServerRequestInterface $request, string $path): string
+    {
+        $uri = $request->getUri();
+        return $uri->getScheme() . '://' . $uri->getHost() . $path;
     }
 }

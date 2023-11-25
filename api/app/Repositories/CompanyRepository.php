@@ -34,19 +34,25 @@ readonly class CompanyRepository implements CompanyRepositoryContract
         if (!$data) {
             throw new ModelNotFoundException("Model not found");
         }
-        
-        return new Company(
-            $data['id'],
-            $data['name'],
-            $data['created_at'],
-            $data['updated_at']
-        );
+    
+        return static::from($data);
     }
     
-    public function paginate(int $perPage = self::PER_PAGE): array
+    public function paginate(int $cursor, int $perPage = self::PER_PAGE): array
     {
-        // TODO: Implement paginate() method.
-        return [];
+        $results = $this->connection
+            ->selectQuery(['*'], ['companies'])
+            ->where(['id >' => $cursor])
+            ->limit($perPage)
+            ->execute()
+            ->fetchAll('assoc');
+    
+        $data = [];
+        foreach ($results as $result) {
+            $data[] = static::from($result);
+        }
+    
+        return $data;
     }
     
     /**
@@ -73,12 +79,7 @@ readonly class CompanyRepository implements CompanyRepositoryContract
             throw new DatabaseException();
         }
         
-        return new Company(
-            $data['id'],
-            $data['name'],
-            $data['created_at'],
-            $data['updated_at']
-        );
+        return static::from($data);
     }
     
     /**
@@ -106,4 +107,14 @@ readonly class CompanyRepository implements CompanyRepositoryContract
         
         return $this->get($id);
     }
+    
+    private function from(array $data): Company {
+        return new Company(
+            $data['id'],
+            $data['name'],
+            $data['created_at'],
+            $data['updated_at']
+        );
+    }
+    
 }

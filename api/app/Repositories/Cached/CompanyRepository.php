@@ -65,9 +65,9 @@ readonly class CompanyRepository implements CompanyRepositoryContract
         );
     }
     
-    public function paginate(int $perPage = self::PER_PAGE): array
+    public function paginate(int $cursor, int $perPage = self::PER_PAGE): array
     {
-        return $this->repository->paginate($perPage);
+        return $this->repository->paginate($cursor, $perPage);
     }
     
     /**

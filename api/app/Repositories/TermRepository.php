@@ -59,37 +59,47 @@ readonly class TermRepository implements TermsRepositoryContract
             throw new ModelNotFoundException("Model not found");
         }
     
-        return new Term(
-            $data['id'],
-            new Job(
-                $data['jobId'],
-                $data['jobName'],
-                $data['during'],
-                null,
-                $data['jobCreatedAt'],
-                $data['jobUpdatedAt']
-            ),
-            new Company(
-                $data['companyId'],
-                $data['companyName'],
-                $data['companyCreatedAt'],
-                $data['companyUpdatedAt']),
-            new User(
-                $data['userId'],
-                $data['email'],
-                $data['password'],
-                null,
-                $data['roleId'],
-                $data['userCreatedAt'],
-                $data['userUpdatedAt']),
-            $data['startDate'],
-            $data['endDate']
-        );
+        return static::from($data);
     }
     
-    public function paginate(int $perPage = self::PER_PAGE): array
+    public function paginate(int $cursor, int $perPage = self::PER_PAGE): array
     {
-        // TODO: Implement paginate() method.
+        $results = $this->connection
+            ->selectQuery([
+                'terms.id as id',
+                'jobs.id as jobId',
+                'jobs.name as jobName',
+                'jobs.during as during',
+                'jobs.created_at as jobCreatedAt',
+                'jobs.updated_at as jobUpdatedAt',
+                'companies.id as companyId',
+                'companies.name as companyName',
+                'companies.created_at as companyCreatedAt',
+                'companies.updated_at as companyUpdatedAt',
+                'users.id as userId',
+                'users.email as email',
+                'users.password as password',
+                'users.role_id as roleId',
+                'users.created_at as userCreatedAt',
+                'users.updated_at as userUpdatedAt',
+                'terms.start_date as startDate',
+                'terms.end_date as endDate'
+            ],
+                'terms')
+            ->innerJoin('jobs', ['jobs.id = terms.job_id'])
+            ->innerJoin('companies', ['companies.id = terms.company_id'])
+            ->innerJoin('users', ['users.id = terms.user_id'])
+            ->where(['id >' => $cursor])
+            ->limit($perPage)
+            ->execute()
+            ->fetchAll('assoc');
+    
+        $data = [];
+        foreach ($results as $result) {
+            $data[] = static::from($result);
+        }
+    
+        return $data;
     }
     
     /**
@@ -174,5 +184,75 @@ readonly class TermRepository implements TermsRepositoryContract
     public function calculateTerms(): array
     {
         // TODO: Implement calculateTerms() method.
+    }
+    
+    public function paginateByCompanyId(int $cursor, int $companyId, int $perPage = self::PER_PAGE): array
+    {
+        $results = $this->connection
+            ->selectQuery([
+                'terms.id as id',
+                'jobs.id as jobId',
+                'jobs.name as jobName',
+                'jobs.during as during',
+                'jobs.created_at as jobCreatedAt',
+                'jobs.updated_at as jobUpdatedAt',
+                'companies.id as companyId',
+                'companies.name as companyName',
+                'companies.created_at as companyCreatedAt',
+                'companies.updated_at as companyUpdatedAt',
+                'users.id as userId',
+                'users.email as email',
+                'users.password as password',
+                'users.role_id as roleId',
+                'users.created_at as userCreatedAt',
+                'users.updated_at as userUpdatedAt',
+                'terms.start_date as startDate',
+                'terms.end_date as endDate'
+            ],
+                'terms')
+            ->innerJoin('jobs', ['jobs.id = terms.job_id'])
+            ->innerJoin('companies', ['companies.id = terms.company_id'])
+            ->innerJoin('users', ['users.id = terms.user_id'])
+            ->where(['id >' => $cursor])
+            ->andWhere(['company_id' => $companyId])
+            ->limit($perPage)
+            ->execute()
+            ->fetchAll('assoc');
+    
+        $data = [];
+        foreach ($results as $result) {
+            $data[] = static::from($result);
+        }
+    
+        return $data;
+    }
+    
+    private function from(array $data): Term {
+        return new Term(
+            $data['id'],
+            new Job(
+                $data['jobId'],
+                $data['jobName'],
+                $data['during'],
+                null,
+                $data['jobCreatedAt'],
+                $data['jobUpdatedAt']
+            ),
+            new Company(
+                $data['companyId'],
+                $data['companyName'],
+                $data['companyCreatedAt'],
+                $data['companyUpdatedAt']),
+            new User(
+                $data['userId'],
+                $data['email'],
+                $data['password'],
+                null,
+                $data['roleId'],
+                $data['userCreatedAt'],
+                $data['userUpdatedAt']),
+            $data['startDate'],
+            $data['endDate']
+        );
     }
 }

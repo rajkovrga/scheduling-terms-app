@@ -42,29 +42,42 @@ readonly class UserRepository implements UserRepositoryContract
             ->where(['users.id' => $id])
             ->execute()
             ->fetch('assoc');
-    
+        
         if (!$data) {
             throw new ModelNotFoundException("Model not found");
         }
     
-        return new User(
-            $data['id'],
-            $data['email'],
-            $data['password'],
-            new Company(
-                $data['companyId'],
-                $data['companyName'],
-                $data['companyCreatedAt'],
-                $data['companyUpdatedAt']),
-            $data['role_id'],
-            $data['created_at'],
-            $data['updated_at']
-        );
+        return static::from($data);
     }
     
-    public function paginate(int $perPage = self::PER_PAGE): array
+    public function paginate(int $cursor, int $perPage = self::PER_PAGE): array
     {
-        // TODO: Implement paginate() method.
+        $results = $this->connection
+            ->selectQuery([
+                'users.id as id',
+                'users.email as email',
+                'users.password as password',
+                'users.created_at as created_at',
+                'users.updated_at as updated_at',
+                'companies.id as companyId',
+                'companies.name as companyName',
+                'companies.created_at as companyCreatedAt',
+                'companies.updated_at as companyUpdatedAt',
+                'users.role_id as role_id'
+            ],
+                'users')
+            ->leftJoin('companies', ['users.company_id = companies.id'])
+            ->where(['id >' => $cursor])
+            ->limit($perPage)
+            ->execute()
+            ->fetchAll('assoc');
+        
+        $data = [];
+        foreach ($results as $result) {
+            $data[] = static::from($result);
+        }
+        
+        return $data;
     }
     
     /**
@@ -72,10 +85,10 @@ readonly class UserRepository implements UserRepositoryContract
      */
     public function delete(int $id): void
     {
-        if($this->connection->selectQuery('*', 'users')->where(['id' => $id])->rowCountAndClose() <= 0) {
+        if ($this->connection->selectQuery('*', 'users')->where(['id' => $id])->rowCountAndClose() <= 0) {
             throw new ModelNotFoundException();
         }
-    
+        
         $this->connection->delete('users', ['id' => $id]);
     }
     
@@ -92,13 +105,13 @@ readonly class UserRepository implements UserRepositoryContract
             'password' => $userDto->roleId,
             'company_id' => $userDto->companyId
         ]);
-    
+        
         if (!$data = $data->execute()) {
             throw new DatabaseException();
         }
         
         $id = $data->lastInsertId();
-    
+        
         return $this->get(intval($id));
     }
     
@@ -117,14 +130,14 @@ readonly class UserRepository implements UserRepositoryContract
                 'company_id' => $userDto->companyId
             ])
             ->where(['id' => $id]);
-    
+        
         if (!$query->execute()) {
             throw new DatabaseException();
         }
-    
+        
         return $this->get($id);
     }
-
+    
     /**
      * @throws ModelNotFoundException
      */
@@ -134,19 +147,59 @@ readonly class UserRepository implements UserRepositoryContract
             ->where(['email' => $email])
             ->execute()
             ->fetch('assoc');
-
+        
         if (!$user) {
             throw new ModelNotFoundException("Model not found");
         }
-
+    
+        return static::from($user);
+    }
+    
+    public function paginateByCompanyId(int $cursor, int $companyId, int $perPage = self::PER_PAGE): array
+    {
+        $results = $this->connection
+            ->selectQuery([
+                'users.id as id',
+                'users.email as email',
+                'users.password as password',
+                'users.created_at as created_at',
+                'users.updated_at as updated_at',
+                'companies.id as companyId',
+                'companies.name as companyName',
+                'companies.created_at as companyCreatedAt',
+                'companies.updated_at as companyUpdatedAt',
+                'users.role_id as role_id'
+            ],
+                'users')
+            ->leftJoin('companies', ['users.company_id = companies.id'])
+            ->where(['id >' => $cursor])
+            ->andWhere(['company_id' => $companyId])
+            ->limit($perPage)
+            ->execute()
+            ->fetchAll('assoc');
+    
+        $data = [];
+        foreach ($results as $result) {
+            $data[] = static::from($result);
+        }
+    
+        return $data;
+    }
+    
+    private function from(array $data): User
+    {
         return new User(
-            $user['id'],
-            $user['email'],
-            $user['password'],
-            null,
-            $user['role_id'],
-            $user['created_at'],
-            $user['updated_at']
+            $data['id'],
+            $data['email'],
+            $data['password'],
+            new Company(
+                $data['companyId'] ?? null,
+                $data['companyName'] ?? null,
+                $data['companyCreatedAt'] ?? null,
+                $data['companyUpdatedAt'] ?? null),
+            $data['role_id'],
+            $data['created_at'],
+            $data['updated_at']
         );
     }
 }

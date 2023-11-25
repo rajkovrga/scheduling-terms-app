@@ -8,21 +8,22 @@ use SchedulingTerms\App\Http\Resources\Companies\CompanyResource;
 use SchedulingTerms\App\Http\Resources\Resource;
 use SchedulingTerms\App\Models\User;
 
-/**
- * @template-extends User
- */
 class UserResource extends Resource
 {
-    public function toArray(Request $request): array
+    /**
+     * @param User $item
+     * @return array
+     */
+    public function toArray($item): array
     {
-        $company = new CompanyResource($this->item->company);
+        $company = new CompanyResource($this->request);
         
         return [
-            'id' => $this->item->id,
-            'email' => $this->item->email,
-            'created_at' => $this->item->createdAt,
-            'updated_at' => $this->item->updatedAt,
-            'company' => $company->toArray($request),
+            'id' => $item->id,
+            'email' => $item->email,
+            'created_at' => $item->createdAt,
+            'updated_at' => $item->updatedAt,
+            'company' => $company->toArray($item->company),
         ];
     }
 }

@@ -19,7 +19,8 @@ readonly class AuthMiddleware
 {
     public function __construct(
         private TokenRepositoryContract $tokenRepository,
-        private UserRepositoryContract  $userRepository
+        private UserRepositoryContract  $userRepository,
+        private AuthRepositoryContract $authRepositoryContract
     )
     {
     }
@@ -38,11 +39,12 @@ readonly class AuthMiddleware
         $data = $this->tokenRepository->get($token);
 
         /** @var User $user */
-        $user = $this->userRepository->get($data->id);
+        $user = $this->userRepository->get($data->user->id);
         $req = new AppRequest($request);
     
         $req->currentUser = $user;
         $req->token = $token;
+        $req->permissions = $this->authRepositoryContract->getPermissions($user->roleId);
     
         return $handler->handle($req);
     }

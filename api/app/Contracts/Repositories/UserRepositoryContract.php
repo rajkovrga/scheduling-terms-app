@@ -10,4 +10,5 @@ interface UserRepositoryContract extends RepositoryContract
     public function create(CreateUpdateUserDto $userDto): User;
     public function update(int $id, CreateUpdateUserDto $userDto): User;
     public function getByEmail(string $email): User;
+    public function paginateByCompanyId(int $cursor, int $companyId, int $perPage = self::PER_PAGE): array;
 }

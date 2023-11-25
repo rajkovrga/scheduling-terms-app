@@ -45,27 +45,41 @@ readonly class JobRepository implements JobRepositoryContract
         if (!$data) {
             throw new ModelNotFoundException("Model not found");
         }
-        
-        return new Job(
-            $data['id'],
-            $data['name'],
-            $data['during'],
-            new Company(
-                $data['companyId'],
-                $data['companyName'],
-                $data['companyCreatedAt'],
-                $data['companyUpdatedAt']
-            ),
-            $data['created_at'],
-            $data['updated_at'],
-        );
+    
+        return static::from($data);
     }
     
-    public function paginate(int $perPage = self::PER_PAGE): array
+    public function paginate(int $cursor, int $perPage = self::PER_PAGE): array
     {
-        // TODO: Implement paginate() method.
+        $results = $this->connection
+            ->selectQuery([
+                'jobs.id as id',
+                'companies.id as companyId',
+                'jobs.name as name',
+                'jobs.during as during',
+                'jobs.created_at as created_at',
+                'jobs.updated_at as updated_at',
+                'companies.name as companyName',
+                'companies.created_at as companyCreatedAt',
+                'companies.updated_at as companyUpdatedAt',
+            ], ['jobs'])
+            ->innerJoin('companies', ['jobs.company_id = companies.id'])
+            ->where(['id >' => $cursor])
+            ->limit($perPage)
+            ->execute()
+            ->fetchAll('assoc');
+    
+        $data = [];
+        foreach ($results as $result) {
+            $data[] = static::from($result);
+        }
+    
+        return $data;
     }
     
+    /**
+     * @throws ModelNotFoundException
+     */
     public function delete(int $id): void
     {
         if ($this->connection->selectQuery('*', 'jobs')->where(['id' => $id])->rowCountAndClose() <= 0) {
@@ -117,4 +131,49 @@ readonly class JobRepository implements JobRepositoryContract
     
         return $this->get($id);
     }
+    public function paginateByCompanyId(int $cursor, int $companyId, int $perPage = self::PER_PAGE): array
+    {
+        $results = $this->connection
+            ->selectQuery([
+                'jobs.id as id',
+                'companies.id as companyId',
+                'jobs.name as name',
+                'jobs.during as during',
+                'jobs.created_at as created_at',
+                'jobs.updated_at as updated_at',
+                'companies.name as companyName',
+                'companies.created_at as companyCreatedAt',
+                'companies.updated_at as companyUpdatedAt',
+            ], ['jobs'])
+            ->innerJoin('companies', ['jobs.company_id = companies.id'])
+            ->where(['id >' => $cursor])
+            ->andWhere(['company_id' => $companyId])
+            ->limit($perPage)
+            ->execute()
+            ->fetchAll('assoc');
+    
+        $data = [];
+        foreach ($results as $result) {
+            $data[] = static::from($result);
+        }
+    
+        return $data;
+    }
+    
+    private function from(array $data): Job {
+        return new Job(
+            $data['id'],
+            $data['name'],
+            $data['during'],
+            new Company(
+                $data['companyId'],
+                $data['companyName'],
+                $data['companyCreatedAt'],
+                $data['companyUpdatedAt']
+            ),
+            $data['created_at'],
+            $data['updated_at'],
+        );
+    }
+    
 }

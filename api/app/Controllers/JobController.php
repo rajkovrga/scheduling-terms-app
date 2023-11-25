@@ -3,7 +3,7 @@ declare(strict_types=1);
 namespace SchedulingTerms\App\Controllers;
 
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
+use Rakit\Validation\RuleQuashException;
 use SchedulingTerms\App\Contracts\Repositories\JobRepositoryContract;
 use SchedulingTerms\App\Core\Routing\Attributes\DeleteRoute;
 use SchedulingTerms\App\Core\Routing\Attributes\GetRoute;
@@ -11,9 +11,12 @@ use SchedulingTerms\App\Core\Routing\Attributes\GroupRoute;
 use SchedulingTerms\App\Core\Routing\Attributes\PostRoute;
 use SchedulingTerms\App\Core\Routing\Attributes\PutRoute;
 use SchedulingTerms\App\Dto\Jobs\CreateUpdateJobDto;
+use SchedulingTerms\App\Exceptions\PermissionDeniedException;
+use SchedulingTerms\App\Http\AppRequest;
 use SchedulingTerms\App\Http\Resources\Jobs\JobResource;
+use SchedulingTerms\App\Http\Resources\Pagination\PaginationResource;
 use SchedulingTerms\App\Http\Validators\Jobs\JobRequestValidator;
-use SchedulingTerms\App\Models\Job;
+use SchedulingTerms\App\Utils\Permissions;
 
 #[GroupRoute('/jobs', ['auth'])]
 readonly class JobController
@@ -24,26 +27,40 @@ readonly class JobController
     {
     }
 
-    #[GetRoute('/paginate/{cursor}',  ['auth'])]
-    public function getJobs(ServerRequestInterface $request,ResponseInterface $response) {
-        $data = $this->jobRepository->paginate();
+    #[GetRoute('/paginate/{cursor:0}',  ['auth'])]
+    public function getJobs(AppRequest $request,ResponseInterface $response, int $cursor = 0) {
+        if($request->can(Permissions::ViewAllJobs)) {
+            $data = $this->jobRepository->paginate($cursor);
+        }
     
-        return $response->withJson((new JobResource($data))->toCollection($data),200);
+        if($request->can(Permissions::ViewJobs)) {
+            $data = $this->jobRepository->paginateByCompanyId($cursor);
+        }
+        
+        return $response->withJson((new PaginationResource($request))->toArray((new JobResource($request))->toCollection($data)),200);
     }
-
-    #[GetRoute('/{id}')]
-    public function getJob(ServerRequestInterface $request,ResponseInterface $response, int $id) {
-        // TODO: check permission
     
-        /** @var Job $job */
+    /**
+     * @throws PermissionDeniedException
+     */
+    #[GetRoute('/{id}')]
+    public function getJob(AppRequest $request,ResponseInterface $response, int $id) {
+        if(!$request->can(Permissions::ViewAllJobs) || $id !== $request->user()->company->id) {
+            throw new PermissionDeniedException();
+        }
+    
         $job = $this->jobRepository->get($id);
         
-        return $response->withJson((new JobResource($job))->toArray($request), 200);
+        return $response->withJson((new JobResource($request))->toArray($job), 200);
     }
-
+    
+    /**
+     * @throws RuleQuashException
+     * @throws PermissionDeniedException
+     */
     #[PostRoute('')]
-    public function createJob(ServerRequestInterface $request, ResponseInterface $response) {
-        // TODO: check permission
+    public function createJob(AppRequest $request, ResponseInterface $response) {
+        $request->checkPermission(Permissions::CreateJob, $response);
         $data = $request->getParsedBody();
     
         $validator = new JobRequestValidator($request);
@@ -59,19 +76,30 @@ readonly class JobController
             $data['company_id']
         ));
     
-        return $response->withJson((new JobResource($job))->toArray($request), 201);
+        return $response->withJson((new JobResource($request))->toArray($job), 201);
     }
-
+    
+    /**
+     * @throws PermissionDeniedException
+     */
     #[DeleteRoute('/{id}')]
-    public function deleteJob(ServerRequestInterface $request,ResponseInterface $response, int $id): ResponseInterface
+    public function deleteJob(AppRequest $request,ResponseInterface $response, int $id): ResponseInterface
     {
+        $request->checkPermission(Permissions::DeleteJob, $response);
+    
         $this->jobRepository->delete($id);
     
         return $response->withStatus(204);
     }
-
+    
+    /**
+     * @throws RuleQuashException
+     * @throws PermissionDeniedException
+     */
     #[PutRoute('/{id}')]
-    public function editJob(ServerRequestInterface $request,ResponseInterface $response, int $id) {
+    public function editJob(AppRequest $request,ResponseInterface $response, int $id) {
+        $request->checkPermission(Permissions::EditJob, $response);
+    
         $data = $request->getParsedBody();
     
         $validator = new JobRequestValidator($request);
@@ -87,6 +115,6 @@ readonly class JobController
             $data['company_id']
         ));
     
-        return $response->withJson((new JobResource($job))->toArray($request), 200);
+        return $response->withJson((new JobResource($request))->toArray($job), 200);
     }
 }

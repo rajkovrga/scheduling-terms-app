@@ -72,9 +72,10 @@ readonly class UserRepository implements UserRepositoryContract
         );
     }
     
-    public function paginate(int $perPage = self::PER_PAGE): array
+     public function paginate(int $cursor, int $perPage = self::PER_PAGE): array
+
     {
-        return $this->repository->paginate($perPage);
+        return $this->repository->paginate($cursor, $perPage);
     }
     
     /**
@@ -89,5 +90,10 @@ readonly class UserRepository implements UserRepositoryContract
     public function getByEmail(string $email): User
     {
         return $this->repository->getByEmail($email);
+    }
+    
+    public function paginateByCompanyId(int $cursor, int $companyId, int $perPage = self::PER_PAGE): array
+    {
+        return $this->repository->paginateByCompanyId($cursor, $companyId, $perPage);
     }
 }

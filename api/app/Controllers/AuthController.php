@@ -14,12 +14,14 @@ use SchedulingTerms\App\Core\Routing\Attributes\GetRoute;
 use SchedulingTerms\App\Core\Routing\Attributes\PostRoute;
 use SchedulingTerms\App\Core\Routing\Attributes\PutRoute;
 use SchedulingTerms\App\Dto\Tokens\CreateTokenDto;
+use SchedulingTerms\App\Exceptions\PermissionDeniedException;
 use SchedulingTerms\App\Helpers\Hasher;
 use SchedulingTerms\App\Http\AppRequest;
 use SchedulingTerms\App\Http\Resources\Users\UserResource;
 use SchedulingTerms\App\Http\Validators\Auth\ChangePasswordValidator;
 use SchedulingTerms\App\Http\Validators\Auth\ForgotPasswordValidator;
 use SchedulingTerms\App\Http\Validators\Auth\LoginValidator;
+use SchedulingTerms\App\Utils\Permissions;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 
 readonly class AuthController
@@ -52,14 +54,18 @@ readonly class AuthController
         $user = $this->userRepository->getByEmail($data['email']);
 
         if (!password_verify($data['password'], $user->password)) {
-            return $response->withStatus(403);
+            return $response->withJson('User credentials is not correct',401);
+        }
+        
+        $token = $this->tokenRepository->getByUserId($user->id);
+
+        if($token) {
+            return $response->withJson([
+                'token' => $token->token
+            ], 201);
         }
 
-        if($this->tokenRepository->getByUserId($user->id)) {
-            return $response->withJson('User just logged in', 401);
-        }
-
-        $token = $this->hasher->hashToken(str_shuffle($user->email));
+        $token = $this->hasher->hashAuthToken(str_shuffle($user->email));
 
         $this->tokenRepository->create(new CreateTokenDto(
             $user->id,
@@ -78,7 +84,7 @@ readonly class AuthController
     #[GetRoute('/me', ['auth'])]
     public function me(AppRequest $request, ResponseInterface $response): ResponseInterface
     {
-        return $response->withJson((new UserResource($request->user()))->toArray($request), 201);
+        return $response->withJson((new UserResource($request))->toArray($request->user()), 201);
     }
     
     #[GetRoute('/auth/permissions', ['auth'])]
@@ -86,7 +92,10 @@ readonly class AuthController
     {
         return $response->withJson($this->authRepositoryContract->getPermissions($request->user()->roleId), 201);
     }
-
+    
+    /**
+     * @throws RuleQuashException
+     */
     #[PostRoute('/forget-password')]
     public function forgetPassword(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
@@ -143,7 +152,16 @@ readonly class AuthController
     public function logout(AppRequest $request, ResponseInterface $response): ResponseInterface
     {
         $this->tokenRepository->delete($request->token);
-        return $response->withJson("Successfully logout", 204);
+        return $response->withStatus( 204);
+    }
+    
+    /**
+     * @throws PermissionDeniedException
+     */
+    public function changeProfileImage(AppRequest $request, ResponseInterface $response): ResponseInterface {
+        $request->checkPermission(Permissions::EditProfile, $response);
+        
+        return $response->withStatus( 204);
     }
 
 }

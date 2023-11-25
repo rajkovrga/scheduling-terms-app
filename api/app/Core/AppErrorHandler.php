@@ -6,7 +6,9 @@ use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
+use SchedulingTerms\App\Exceptions\AuthException;
 use SchedulingTerms\App\Exceptions\ModelNotFoundException;
+use SchedulingTerms\App\Exceptions\PermissionDeniedException;
 use SchedulingTerms\App\Exceptions\TokenAuthException;
 use Slim\Handlers\ErrorHandler;
 use Slim\Interfaces\CallableResolverInterface;
@@ -26,7 +28,9 @@ class AppErrorHandler extends ErrorHandler
 
         return match ($this->exception::class) {
             ModelNotFoundException::class => 404,
-            TokenAuthException::class => 403,
+            TokenAuthException::class,
+            PermissionDeniedException::class => 403,
+            AuthException::class => 401,
             default => 500
         };
     }

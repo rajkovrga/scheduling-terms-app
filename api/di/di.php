@@ -65,7 +65,8 @@ return [
     UserController::class => static function (Container $container) {
         return new UserController(
             $container->get(UserRepositoryContract::class),
-            $container->get(Hasher::class)
+            $container->get(Hasher::class),
+            $container->get(IEmailService::class)
         );
     },
     AuthController::class => static function (Container $container) {

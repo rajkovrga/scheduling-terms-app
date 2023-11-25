@@ -12,18 +12,41 @@ use SchedulingTerms\App\Exceptions\TokenAuthException;
 use SchedulingTerms\App\Models\Token;
 use SchedulingTerms\App\Models\User;
 
-class TokenRepository implements TokenRepositoryContract
+readonly class TokenRepository implements TokenRepositoryContract
 {
     public function __construct(
-        private readonly Connection $connection
+        private Connection $connection
     )
     {
     }
     
-    public function paginate(int $perPage = self::PER_PAGE): array
-    {
-
-    }
+     public function paginate(int $cursor, int $perPage = self::PER_PAGE): array
+     {
+         $results = $this->connection
+             ->selectQuery([
+                 'tokens.id as id',
+                 'users.id as userId',
+                 'users.email as email',
+                 'users.password as password',
+                 'users.role_id as roleId',
+                 'users.created_at as userCreatedAt',
+                 'users.updated_at as userUpdatedAt',
+                 'tokens.token as token'
+             ],
+                 'tokens')
+             ->innerJoin('users', ['users.id = tokens.user_id'])
+             ->where(['id >' => $cursor])
+             ->limit($perPage)
+             ->execute()
+             ->fetchAll('assoc');
+    
+         $data = [];
+         foreach ($results as $result) {
+             $data[] = static::from($result);
+         }
+    
+         return $data;
+     }
 
     /**
      * @throws ModelNotFoundException
@@ -64,19 +87,8 @@ class TokenRepository implements TokenRepositoryContract
         if (!$data) {
             throw new TokenAuthException("Model not found");
         }
-
-        return new Token(
-            $data['id'],
-            new User(
-                $data['userId'],
-                $data['email'],
-                $data['password'],
-                null,
-                $data['roleId'],
-                $data['userCreatedAt'],
-                $data['userUpdatedAt']),
-            $data['token'],
-        );
+    
+        return static::from($data);
     }
 
     public function create(CreateTokenDto $tokenDto): Token
@@ -118,7 +130,11 @@ class TokenRepository implements TokenRepositoryContract
         if (!$data) {
             return null;
         }
-
+    
+        return static::from($data);
+    }
+    
+    private function from(array $data): Token {
         return new Token(
             $data['id'],
             new User(

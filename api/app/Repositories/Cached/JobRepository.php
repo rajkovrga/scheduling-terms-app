@@ -72,9 +72,10 @@ readonly class JobRepository implements JobRepositoryContract
         );
     }
     
-    public function paginate(int $perPage = self::PER_PAGE): array
+     public function paginate(int $cursor, int $perPage = self::PER_PAGE): array
+
     {
-        return $this->repository->paginate($perPage);
+        return $this->repository->paginate($cursor, $perPage);
     }
     
     /**
@@ -84,5 +85,10 @@ readonly class JobRepository implements JobRepositoryContract
     {
         $this->repository->delete($id);
         $this->cache->delete((string)$id);
+    }
+    
+    public function paginateByCompanyId(int $cursor, int $companyId, int $perPage = self::PER_PAGE): array
+    {
+        return $this->repository->paginateByCompanyId($cursor, $companyId, $perPage);
     }
 }
