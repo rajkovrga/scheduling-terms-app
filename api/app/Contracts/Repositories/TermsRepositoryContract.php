@@ -2,6 +2,7 @@
 declare(strict_types=1);
 namespace SchedulingTerms\App\Contracts\Repositories;
 
+use Carbon\CarbonImmutable;
 use SchedulingTerms\App\Dto\Terms\CreateUpdateTermDto;
 use SchedulingTerms\App\Models\Term;
 
@@ -15,6 +16,6 @@ interface TermsRepositoryContract extends RepositoryContract
     /**
      * @return array<T>
      */
-    public function calculateTerms(): array;
+    public function calculateTerms(int $companyId, int $userId, int $jobId, CarbonImmutable $date): array;
     public function paginateByCompanyId(int $cursor, int $companyId, int $perPage = self::PER_PAGE): array;
 }

@@ -22,6 +22,7 @@ use SchedulingTerms\App\Contracts\Repositories\TermsRepositoryContract;
 use SchedulingTerms\App\Contracts\Repositories\TokenRepositoryContract;
 use SchedulingTerms\App\Contracts\Repositories\UserRepositoryContract;
 use SchedulingTerms\App\Helpers\Cache;
+use SchedulingTerms\App\Utils\Config;
 
 return [
     CompanyRepositoryContract::class => static function (Container $container) {
@@ -49,7 +50,9 @@ return [
     TermsRepositoryContract::class => static function (Container $container) {
         return new CacheTermRepository(
             new TermRepository(
-                $container->get(Connection::class)),
+                $container->get(Connection::class),
+                $container->get(Config::class)
+            ),
             new Cache(
                 $container->get(Redis::class),
                 $container->get('term')['duration'],

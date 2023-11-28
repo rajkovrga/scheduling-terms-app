@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace SchedulingTerms\App\Controllers;
 
+use Carbon\CarbonImmutable;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
 use Rakit\Validation\RuleQuashException;
 use SchedulingTerms\App\Contracts\Repositories\TermsRepositoryContract;
 use SchedulingTerms\App\Core\Routing\Attributes\DeleteRoute;
@@ -18,10 +18,10 @@ use SchedulingTerms\App\Http\AppRequest;
 use SchedulingTerms\App\Http\Resources\Pagination\PaginationResource;
 use SchedulingTerms\App\Http\Resources\Terms\TermResource;
 use SchedulingTerms\App\Http\Validators\Terms\TermRequestValidator;
-use SchedulingTerms\App\Models\Term;
 use SchedulingTerms\App\Utils\Permissions;
+use Psr\Http\Message\ServerRequestInterface;
 
-#[GroupRoute('/terms', ['auth'])]
+#[GroupRoute('/terms')]
 readonly class TermController
 {
     public function __construct(
@@ -46,7 +46,7 @@ readonly class TermController
     /**
      * @throws PermissionDeniedException
      */
-    #[GetRoute('/{id}')]
+    #[GetRoute('/{id}', ['auth'])]
     public function getTerm(AppRequest $request, ResponseInterface $response, int $id)
     {
         if(!$request->can(Permissions::ViewTerms) || $id !== $request->user()->company->id) {
@@ -61,7 +61,7 @@ readonly class TermController
      * @throws RuleQuashException
      * @throws PermissionDeniedException
      */
-    #[PostRoute('')]
+    #[PostRoute('', ['auth'])]
     public function createTerm(AppRequest $request, ResponseInterface $response)
     {
         $request->checkPermission(Permissions::CreateTerm, $response);
@@ -88,7 +88,7 @@ readonly class TermController
     /**
      * @throws PermissionDeniedException
      */
-    #[DeleteRoute('/{id}')]
+    #[DeleteRoute('/{id}', ['auth'])]
     public function deleteTerm(AppRequest $request, ResponseInterface $response, int $id): ResponseInterface
     {
         $request->checkPermission(Permissions::DeleteTerm, $response);
@@ -102,27 +102,20 @@ readonly class TermController
      * @throws RuleQuashException
      * @throws PermissionDeniedException
      */
-    #[PutRoute('/{id}')]
-    public function editTerm(AppRequest $request, ResponseInterface $response, int $id)
+    #[GetRoute('/caluclate/{companyId}')]
+    public function calculateTerms(ServerRequestInterface $request, ResponseInterface $response, int $companyId)
     {
-        $request->checkPermission(Permissions::EditTerm, $response);
+//        $data = $request->getParsedBody();
     
-        $data = $request->getParsedBody();
+//        $validator = new TermRequestValidator($request);
+//        $result = $validator->validated($data);
+//
+//        if($result->fails()) {
+//            return $response->withJson($result->errors()->toArray(), 409);
+//        }
+//
+        //TODO: calculate
     
-        $validator = new TermRequestValidator($request);
-        $result = $validator->validated($data);
-    
-        if($result->fails()) {
-            return $response->withJson($result->errors()->toArray(), 409);
-        }
-    
-        $term = $this->termRepository->update($id, new CreateUpdateTermDto(
-            $data['user_id'],
-            $data['job_id'],
-            $data['company_id'],
-            $data['start_date']
-        ));
-    
-        return $response->withJson((new TermResource($request))->toArray($term), 200);
+        return $response->withJson($this->termRepository->calculateTerms(0, 1, 0, CarbonImmutable::now()), 200);
     }
 }

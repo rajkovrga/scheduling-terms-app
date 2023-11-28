@@ -29,7 +29,6 @@ readonly class AuthRepository implements AuthRepositoryContract
     public function saveRecoveryToken(string $token, int $userId): void
     {
     }
-    
 
     public function checkRecoveryToken(string $token): ?int
     {

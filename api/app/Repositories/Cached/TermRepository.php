@@ -2,6 +2,7 @@
 declare(strict_types=1);
 namespace SchedulingTerms\App\Repositories\Cached;
 
+use Carbon\CarbonImmutable;
 use RedisException;
 use SchedulingTerms\App\Contracts\Repositories\TermsRepositoryContract;
 use SchedulingTerms\App\Dto\Terms\CreateUpdateTermDto;
@@ -18,14 +19,8 @@ readonly class TermRepository implements TermsRepositoryContract
         private Cache                   $cache)
     {
     }
-    public function calculateTerms(): array
-    {
-        // TODO: Implement calculateTerms() method.
-    }
 
     /**
-     * @param CreateUpdateTermDto $termDto
-     * @return Term
      * @throws RedisException
      */
     public function create(CreateUpdateTermDto $termDto): Term
@@ -37,9 +32,6 @@ readonly class TermRepository implements TermsRepositoryContract
     }
 
     /**
-     * @param int $id
-     * @param CreateUpdateTermDto $termDto
-     * @return Term
      * @throws RedisException
      */
     public function update(int $id, CreateUpdateTermDto $termDto): Term
@@ -92,8 +84,7 @@ readonly class TermRepository implements TermsRepositoryContract
         );
     }
     
-     public function paginate(int $cursor, int $perPage = self::PER_PAGE): array
-
+    public function paginate(int $cursor, int $perPage = self::PER_PAGE): array
     {
         return $this->repository->paginate($cursor, $perPage);
     }
@@ -110,5 +101,10 @@ readonly class TermRepository implements TermsRepositoryContract
     public function paginateByCompanyId(int $cursor, int $companyId, int $perPage = self::PER_PAGE): array
     {
         return $this->repository->paginateByCompanyId($cursor, $companyId, $perPage);
+    }
+    
+    public function calculateTerms(int $companyId, int $userId, int $jobId, CarbonImmutable $date): array
+    {
+        return $this->repository->calculateTerms($companyId, $userId, $jobId, $date);
     }
 }

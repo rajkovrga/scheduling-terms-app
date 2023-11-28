@@ -12,11 +12,13 @@ use SchedulingTerms\App\Models\Company;
 use SchedulingTerms\App\Models\Job;
 use SchedulingTerms\App\Models\Term;
 use SchedulingTerms\App\Models\User;
+use SchedulingTerms\App\Utils\Config;
 
 readonly class TermRepository implements TermsRepositoryContract
 {
     public function __construct(
-        private ConnectionInterface $connection
+        private ConnectionInterface $connection,
+        private Config $config
     )
     {
     }
@@ -114,10 +116,7 @@ readonly class TermRepository implements TermsRepositoryContract
         $this->connection->delete('terms', ['id' => $id]);
     }
     
-    
     /**
-     * @param CreateUpdateTermDto $termDto
-     * @return Term
      * @throws ModelNotFoundException
      */
     public function create(CreateUpdateTermDto $termDto): Term
@@ -147,9 +146,6 @@ readonly class TermRepository implements TermsRepositoryContract
     }
     
     /**
-     * @param int $id
-     * @param CreateUpdateTermDto $termDto
-     * @return Term
      * @throws ModelNotFoundException
      */
     public function update(int $id, CreateUpdateTermDto $termDto): Term
@@ -176,14 +172,6 @@ readonly class TermRepository implements TermsRepositoryContract
         }
     
         return $this->get($id);
-    }
-    
-    /**
-     * @return array
-     */
-    public function calculateTerms(): array
-    {
-        // TODO: Implement calculateTerms() method.
     }
     
     public function paginateByCompanyId(int $cursor, int $companyId, int $perPage = self::PER_PAGE): array
@@ -225,6 +213,44 @@ readonly class TermRepository implements TermsRepositoryContract
         }
     
         return $data;
+    }
+    
+    public function calculateTerms(int $companyId, int $userId, int $jobId, CarbonImmutable $date): array
+    {
+        $terms = $this->connection
+            ->selectQuery([
+                'start_date as startTerm',
+                'end_date as endTerm'
+            ], 'terms')
+            ->where(['terms.user_id' => $userId])
+            ->execute()
+            ->fetchAll();
+        
+       
+        $minTimeInterval = $this->config->get('minimalTimeInterval', 15);
+        
+        $startWt = 9 * 60; //TODO: get worktime from start to finish from db
+        
+        $startTime = 8; //TODO: get from db
+        $intervalList = [];
+        
+        $countTerms = $startWt / $minTimeInterval;
+        
+        for ($i = 0; $i < $countTerms; $i++) {
+            $intervalList[] = $i * $minTimeInterval;
+        }
+        
+        // calculate interval
+        
+        
+        
+        $result = [];
+    
+        foreach ($intervalList as $item) {
+            $result[] = $date->setHour($startTime)->setMinutes($item);
+        }
+        
+        return $terms;
     }
     
     private function from(array $data): Term {

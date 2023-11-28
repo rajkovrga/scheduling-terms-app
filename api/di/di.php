@@ -27,7 +27,6 @@ return [
         ConnectionManager::setConfig('default', $container->get(Config::class)->get('database.pgsql'));
         return ConnectionManager::get('default');
     },
-
     Redis::class => static function (Container $container) {
         $config = $container->get(Config::class)->get('database.redis');
         $redis = new Redis(
