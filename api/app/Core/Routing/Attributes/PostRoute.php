@@ -10,8 +10,8 @@ use SchedulingTerms\App\Enums\HttpMethod;
 #[Attribute(Attribute::TARGET_METHOD)]
 readonly class PostRoute extends Route
 {
-    public function __construct(string $path, array $middlewares = [], bool $acceptGroupMiddlewares = true)
+    public function __construct(string $path, array $middlewares = [], bool $skipGroupMiddleware = false)
     {
-        parent::__construct(HttpMethod::POST, $path, $middlewares, $acceptGroupMiddlewares);
+        parent::__construct(HttpMethod::POST, $path, $middlewares, $skipGroupMiddleware);
     }
 }

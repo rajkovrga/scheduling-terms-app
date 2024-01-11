@@ -9,8 +9,8 @@ use SchedulingTerms\App\Enums\HttpMethod;
 #[Attribute(Attribute::TARGET_METHOD)]
 readonly class DeleteRoute extends Route
 {
-    public function __construct(string $path, array $middlewares = [], bool $acceptGroupMiddlewares = true)
+    public function __construct(string $path, array $middlewares = [], bool $skipGroupMiddleware = false)
     {
-        parent::__construct(HttpMethod::DELETE, $path, $middlewares, $acceptGroupMiddlewares);
+        parent::__construct(HttpMethod::DELETE, $path, $middlewares, $skipGroupMiddleware);
     }
 }

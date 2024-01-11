@@ -68,6 +68,11 @@ return [
                 $container->get(Redis::class),
                 $container->get('token')['duration'],
                 $container->get('token')['prefix']
+            ),
+            new Cache(
+                $container->get(Redis::class),
+                $container->get('csrf')['duration'],
+                $container->get('csrf')['prefix']
             )
         );
     },

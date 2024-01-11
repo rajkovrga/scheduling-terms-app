@@ -163,5 +163,19 @@ readonly class AuthController
         
         return $response->withStatus( 204);
     }
+    
+    #[PostRoute('/logout', ['auth'])]
+    public function csrf(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface {
+        
+        $token = random_bytes(rand(8,11));
+        
+        $return = $this->tokenRepository->createCsrf($token);
+        
+        return $response
+            ->withJson([
+                'csrf' => $token
+            ])
+            ->withStatus(201);
+    }
 
 }

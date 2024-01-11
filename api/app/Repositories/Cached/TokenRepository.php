@@ -13,7 +13,8 @@ readonly class TokenRepository implements TokenRepositoryContract
 {
     public function __construct(
         private TokenRepositoryContract $repository,
-        private Cache                   $cache
+        private Cache                   $cache,
+        private Cache $csrfCache
     )
     {
     }
@@ -76,5 +77,22 @@ readonly class TokenRepository implements TokenRepositoryContract
     public function getByUserId(int $userId): ?Token
     {
         return $this->repository->getByUserId($userId);
+    }
+    
+    public function createCsrf(string $token): string
+    {
+        $this->cache->set($token, $token);
+    
+        return $token;
+    }
+    
+    public function checkCsrf(string $token): bool
+    {
+        return $this->csrfCache->get($token) !== null;
+    }
+    
+    public function deleteCsrf(string $token): void
+    {
+        $this->csrfCache->delete($token);
     }
 }

@@ -32,4 +32,8 @@ return [
         'prefix' => 'recovery',
         'duration' => CarbonInterval::minutes(45),
     ],
+    'csrf' => [
+        'prefix' => 'csrf',
+        'duration' => CarbonInterval::minutes(30),
+    ],
 ];

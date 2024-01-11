@@ -148,4 +148,18 @@ readonly class TokenRepository implements TokenRepositoryContract
             $data['token'],
         );
     }
+    
+    public function createCsrf(string $token): string
+    {
+        return '';
+    }
+    
+    public function checkCsrf(string $token): bool
+    {
+        return false;
+    }
+    
+    public function deleteCsrf(string $token): void
+    {
+    }
 }

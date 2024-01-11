@@ -11,7 +11,7 @@ readonly class Route
         public HttpMethod $method,
         public string $path,
         public array $middlewares = [],
-        public bool $acceptGroupMiddlewares = true
+        public bool $skipGroupMiddleware = false
     ) {
     }
 }

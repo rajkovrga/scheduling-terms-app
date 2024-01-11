@@ -10,10 +10,7 @@ use SchedulingTerms\App\Contracts\Repositories\UserRepositoryContract;
 use SchedulingTerms\App\Exceptions\AuthException;
 use SchedulingTerms\App\Http\AppRequest;
 use SchedulingTerms\App\Models\User;
-use SchedulingTerms\App\Utils\CurrentUser;
 use Slim\Http\ServerRequest;
-use Slim\Psr7\Request;
-use Slim\Psr7\Response;
 
 readonly class AuthMiddleware
 {

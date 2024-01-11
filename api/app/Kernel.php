@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace SchedulingTerms\App;
 
 use SchedulingTerms\App\Middlewares\AuthMiddleware;
+use SchedulingTerms\App\Middlewares\CsrfMiddleware;
 
 class Kernel extends Core\Kernel
 {
@@ -11,5 +12,7 @@ class Kernel extends Core\Kernel
         'auth' => AuthMiddleware::class
     ];
 
-    protected static array $globalMiddlewares = [];
+    protected static array $globalMiddlewares = [
+        CsrfMiddleware::class
+    ];
 }

@@ -10,8 +10,8 @@ use SchedulingTerms\App\Enums\HttpMethod;
 readonly class GetRoute extends Route
 {
 
-    public function __construct(string $path, array $middlewares = [], bool $acceptGroupMiddlewares = true)
+    public function __construct(string $path, array $middlewares = [], bool $skipGroupMiddleware = false)
     {
-        parent::__construct(HttpMethod::GET, $path, $middlewares, $acceptGroupMiddlewares);
+        parent::__construct(HttpMethod::GET, $path, $middlewares, $skipGroupMiddleware);
     }
 }
