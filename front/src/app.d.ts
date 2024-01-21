@@ -5,7 +5,12 @@ import type { User } from '$lib/store';
 
 declare global {
 	namespace App {
-
+		// interface Error {}
+		interface Locals {
+			session: User;
+		}
+		// interface PageData {}
+		// interface Platform {}
 	}
 }
 

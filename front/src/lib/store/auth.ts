@@ -1,12 +1,13 @@
+import type { UserModel } from '$lib/models/user';
 import { writable } from 'svelte/store';
 import type { Writable } from "svelte/store";
-import type { UserModel } from '$lib/models';
 
 export type User = {
     type: 'authenticated' | 'unauthenticated';
     user: UserModel | null;
     timeZone?: string;
     locale?: string;
+    permissions?: [];
 };
 
 export const user = <Writable<User>>writable({

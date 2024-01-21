@@ -1,5 +1,4 @@
 import { DateTime } from 'luxon';
-
 import { getNavigatorLanguage } from './locale';
 
 export const getTimeZone = () => Intl.DateTimeFormat().resolvedOptions().timeZone;

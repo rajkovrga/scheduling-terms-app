@@ -1,11 +1,11 @@
 import type {CompanyModel} from "./company";
 import type {RoleModel} from "./auth";
+import type { TimestampModel } from ".";
 
-export interface UserModel {
+export interface UserModel extends TimestampModel {
     id: number;
     email: string;
     company: CompanyModel | null;
-    role: RoleModel | null;
 }
 
 export interface UserRequest {

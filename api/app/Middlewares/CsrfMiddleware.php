@@ -19,16 +19,24 @@ class CsrfMiddleware
     }
     public function __invoke(ServerRequest $request, RequestHandler $handler): ResponseInterface
     {
-        $token = $request->getHeaderLine('Token');
-        
-        $result = $this->tokenRepository->checkCsrf($token);
-        
-        if(!$result && $request->getUri()->getPath() !== '/csrf') {
-            throw new RequestException('Request is not valid', $request);
+        if($request->getUri()->getPath() == '/csrf') {
+            return $handler->handle($request);
         }
         
+        $token = $request->getHeaderLine('X-XSRF-TOKEN');
+
+//        if($token === '') {
+//            throw new RequestException('Request is not valid aaaaa', $request);
+//        }
+//
+        $result = $this->tokenRepository->checkCsrf($token);
+    
         $this->tokenRepository->deleteCsrf($token);
-        
+    
+//        if(!$result) {
+//            throw new RequestException('Request is not valid', $request);
+//        }
+
         return $handler->handle($request);
     }
 }
