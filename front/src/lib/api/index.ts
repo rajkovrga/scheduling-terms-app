@@ -1,5 +1,5 @@
 import type { ApiError } from '$lib/models/errors';
-import { env } from '$env/dynamic/public';
+import { PUBLIC_BASE_URL } from '$env/dynamic/public';
 
 export type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'OPTIONS';
 export type ContentType = 'json' | 'form' | 'formData';
@@ -81,7 +81,7 @@ export const requester = async <TResponse>(
 			}
 		}
 	}
-	const res = await (request.f ?? fetch)(`${env.PUBLIC_BASE_URL}${url}`, {
+	const res = await (request.f ?? fetch)(`${PUBLIC_BASE_URL}${url}`, {
 		method,
 		mode: 'cors',
 		cache: 'no-cache',

@@ -7,7 +7,7 @@ export type User = {
     user: UserModel | null;
     timeZone?: string;
     locale?: string;
-    permissions?: [];
+    permissions?: string[];
 };
 
 export const user = <Writable<User>>writable({

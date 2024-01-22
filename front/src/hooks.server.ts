@@ -1,13 +1,14 @@
 import { redirect, type Handle, type HandleFetch } from '@sveltejs/kit';
 
 import { me } from '$lib/api/user';
+import { PUBLIC_BASE_URL } from '$env/static/public';
 
 const allowedUnauthenticatedRoutes = ['/(auth)/login'];
 
 import { csrf } from '$lib/api';
 
 export const handleFetch = (async ({ request, fetch, event }) => {
-	if (request.url.startsWith(import.meta.env.BASE_URL)) {
+	if (request.url.startsWith(PUBLIC_BASE_URL)) {
 		request.headers.set('cookie', event.request.headers.get('cookie') ?? '');
 		if (request.method !== 'GET' && request.method !== 'OPTIONS') {
 			const controller = new AbortController();
