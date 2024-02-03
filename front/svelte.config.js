@@ -2,11 +2,7 @@ import adapter from '@sveltejs/adapter-node';
 
 import { vitePreprocess } from '@sveltejs/kit/vite';
 
-let assertUrl = '';
 
-if (process.env.NODE_ENV === 'production') {
-	assertUrl = process.env.ASSETS_URL;
-}
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
@@ -26,7 +22,7 @@ const config = {
 			preloadStrategy: 'preload-mjs'
 		},
 		paths: {
-			assets: assertUrl,
+			assets: '',
 			relative: false
 		}
 	},
